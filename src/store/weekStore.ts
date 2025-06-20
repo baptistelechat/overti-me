@@ -81,7 +81,11 @@ const useWeekStore = create<WeekStore>((set, get) => ({
       const lunchBreakStart = dayData.lunchBreakStart || updatedDays[dayIndex].lunchBreakStart;
       const lunchBreakEnd = dayData.lunchBreakEnd || updatedDays[dayIndex].lunchBreakEnd;
       
-      // Calculer la durée si startTime et endTime sont tous les deux définis
+      // Calculer la durée dans différents cas de figure
+      let totalMinutes = 0;
+      let hours = 0;
+      
+      // Cas 1: Journée complète (début et fin renseignés)
       if (startTime && endTime) {
         // Convertir les heures en minutes depuis minuit
         const [startHour, startMinute] = startTime.split(':').map(Number);
@@ -96,7 +100,7 @@ const useWeekStore = create<WeekStore>((set, get) => ({
         }
         
         // Calculer la durée totale sans pause
-        let totalMinutes = endMinutes - startMinutes;
+        totalMinutes = endMinutes - startMinutes;
         
         // Soustraire la pause méridienne si elle est définie
         if (lunchBreakStart && lunchBreakEnd) {
@@ -115,12 +119,46 @@ const useWeekStore = create<WeekStore>((set, get) => ({
           const breakDuration = lunchEndMinutes - lunchStartMinutes;
           totalMinutes -= breakDuration;
         }
-        
-        // Calculer la différence en heures (arrondie à 2 décimales)
-        const hours = Math.round(totalMinutes / 60 * 100) / 100;
-        updatedDays[dayIndex].calculatedDuration = hours;
-        updatedDays[dayIndex].isWorked = hours > 0;
       }
+      // Cas 2: Matinée uniquement (début et début pause renseignés)
+      else if (startTime && lunchBreakStart) {
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [lunchStartHour, lunchStartMinute] = lunchBreakStart.split(':').map(Number);
+        
+        const startMinutes = startHour * 60 + startMinute;
+        let lunchStartMinutes = lunchStartHour * 60 + lunchStartMinute;
+        
+        // Si l'heure de début de pause est avant l'heure de début, on ajoute 24h
+        if (lunchStartMinutes < startMinutes) {
+          lunchStartMinutes += 24 * 60;
+        }
+        
+        // Calculer la durée de la matinée
+        totalMinutes = lunchStartMinutes - startMinutes;
+      }
+      // Cas 3: Après-midi uniquement (fin pause et fin renseignés)
+      else if (lunchBreakEnd && endTime) {
+        const [lunchEndHour, lunchEndMinute] = lunchBreakEnd.split(':').map(Number);
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+        
+        const lunchEndMinutes = lunchEndHour * 60 + lunchEndMinute;
+        let endMinutes = endHour * 60 + endMinute;
+        
+        // Si l'heure de fin est avant l'heure de fin de pause, on ajoute 24h
+        if (endMinutes < lunchEndMinutes) {
+          endMinutes += 24 * 60;
+        }
+        
+        // Calculer la durée de l'après-midi
+        totalMinutes = endMinutes - lunchEndMinutes;
+      }
+      
+      // Calculer la différence en heures (arrondie à 2 décimales)
+      if (totalMinutes > 0) {
+        hours = Math.round(totalMinutes / 60 * 100) / 100;
+      }
+      updatedDays[dayIndex].calculatedDuration = hours;
+      updatedDays[dayIndex].isWorked = hours > 0;
 
       // Mettre à jour la semaine
       set((state) => ({

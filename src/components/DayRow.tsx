@@ -11,7 +11,6 @@ interface DayRowProps {
 }
 
 const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
-
   // Formater la date pour l'affichage
   const date = new Date(day.date);
   const dayName = date.toLocaleDateString("fr-FR", { weekday: "long" });
@@ -31,16 +30,18 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
   };
 
   // Gérer le changement d'heure de début de pause
-  const handleLunchBreakStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLunchBreakStartChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     onUpdate({ lunchBreakStart: e.target.value });
   };
 
   // Gérer le changement d'heure de fin de pause
-  const handleLunchBreakEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLunchBreakEndChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     onUpdate({ lunchBreakEnd: e.target.value });
   };
-
-
 
   // Déterminer la classe CSS en fonction du jour (weekend en gris)
   const isWeekend = dayIndex === 5 || dayIndex === 6; // Samedi ou Dimanche
@@ -123,9 +124,9 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
 
       {/* Durée calculée (en lecture seule) */}
       <TableCell>
-          <span className="font-medium">
-            {day.calculatedDuration.toFixed(2)}h
-          </span>
+        <span className="font-medium">
+          {day.calculatedDuration.toFixed(2)}h
+        </span>
       </TableCell>
     </TableRow>
   );

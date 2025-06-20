@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Schéma Zod pour la validation des données
 export const workDaySchema = z.object({
