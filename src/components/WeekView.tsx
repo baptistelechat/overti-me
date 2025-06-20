@@ -5,7 +5,6 @@ import ExportOptions from "./ExportOptions";
 import WeekNavigation from "./WeekNavigation";
 import WeekSummary from "./WeekSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody } from "./ui/table";
 import { Button } from "./ui/button";
 
 const WeekView: React.FC = () => {

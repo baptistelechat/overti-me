@@ -1,6 +1,6 @@
 import React from "react";
 import { type WeekData } from "../types";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { Progress } from "./ui/progress";
 
 interface WeekSummaryProps {
