@@ -19,6 +19,8 @@ const ExportOptions: React.FC = () => {
     "date",
     "jour",
     "debut",
+    "pauseDebut",
+    "pauseFin",
     "fin",
     "duree",
     "totaux",
@@ -29,6 +31,8 @@ const ExportOptions: React.FC = () => {
     { id: "date", label: "Date (YYYY-MM-DD)" },
     { id: "jour", label: "Jour de la semaine" },
     { id: "debut", label: "Heure de début" },
+    { id: "pauseDebut", label: "Début pause" },
+    { id: "pauseFin", label: "Fin pause" },
     { id: "fin", label: "Heure de fin" },
     { id: "duree", label: "Durée (heures)" },
     { id: "totaux", label: "Totaux et majorations" },
@@ -59,6 +63,8 @@ const ExportOptions: React.FC = () => {
         data.jour = new Intl.DateTimeFormat("fr-FR", options).format(date);
       }
       if (selectedColumns.includes("debut")) data.debut = day.startTime || "";
+      if (selectedColumns.includes("pauseDebut")) data.pauseDebut = day.lunchBreakStart || "";
+      if (selectedColumns.includes("pauseFin")) data.pauseFin = day.lunchBreakEnd || "";
       if (selectedColumns.includes("fin")) data.fin = day.endTime || "";
       if (selectedColumns.includes("duree"))
         data.duree = day.calculatedDuration;

@@ -50,11 +50,13 @@ const WeekView: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30">
-                  <TableHead className="w-[25%] text-center">Jour</TableHead>
-                  <TableHead className="w-[25%] text-center">Date</TableHead>
-                  <TableHead className="w-[16.66%] text-center">Début</TableHead>
-                  <TableHead className="w-[16.66%] text-center">Fin</TableHead>
-                  <TableHead className="w-[16.66%] text-center">Durée</TableHead>
+                  <TableHead className="w-[15%] text-center">Jour</TableHead>
+                  <TableHead className="w-[15%] text-center">Date</TableHead>
+                  <TableHead className="w-[14%] text-center">Début</TableHead>
+                  <TableHead className="w-[14%] text-center">Début pause</TableHead>
+                  <TableHead className="w-[14%] text-center">Fin pause</TableHead>
+                  <TableHead className="w-[14%] text-center">Fin</TableHead>
+                  <TableHead className="w-[14%] text-center">Durée</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

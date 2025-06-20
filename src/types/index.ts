@@ -5,7 +5,10 @@ export const workDaySchema = z.object({
   date: z.string(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
-  // La durée calculée en heures (calculée à partir de startTime/endTime)
+  // Pause méridienne
+  lunchBreakStart: z.string().optional(),
+  lunchBreakEnd: z.string().optional(),
+  // La durée calculée en heures (calculée à partir de startTime/endTime et pause méridienne)
   calculatedDuration: z.number().default(0),
   // Indique si le jour est travaillé
   isWorked: z.boolean().default(false),

@@ -30,6 +30,16 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
     onUpdate({ endTime: e.target.value });
   };
 
+  // Gérer le changement d'heure de début de pause
+  const handleLunchBreakStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUpdate({ lunchBreakStart: e.target.value });
+  };
+
+  // Gérer le changement d'heure de fin de pause
+  const handleLunchBreakEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUpdate({ lunchBreakEnd: e.target.value });
+  };
+
 
 
   // Déterminer la classe CSS en fonction du jour (weekend en gris)
@@ -55,6 +65,41 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
             value={day.startTime || ""}
             onChange={handleStartTimeChange}
             className="w-full"
+            placeholder="Début"
+          />
+        </div>
+      </TableCell>
+
+      {/* Début pause méridienne */}
+      <TableCell>
+        <div className="space-y-1">
+          <Label htmlFor="lunch-break-start" className="sr-only">
+            Début pause
+          </Label>
+          <Input
+            id="lunch-break-start"
+            type="time"
+            value={day.lunchBreakStart || ""}
+            onChange={handleLunchBreakStartChange}
+            className="w-full"
+            placeholder="Début pause"
+          />
+        </div>
+      </TableCell>
+
+      {/* Fin pause méridienne */}
+      <TableCell>
+        <div className="space-y-1">
+          <Label htmlFor="lunch-break-end" className="sr-only">
+            Fin pause
+          </Label>
+          <Input
+            id="lunch-break-end"
+            type="time"
+            value={day.lunchBreakEnd || ""}
+            onChange={handleLunchBreakEndChange}
+            className="w-full"
+            placeholder="Fin pause"
           />
         </div>
       </TableCell>
@@ -71,6 +116,7 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
             value={day.endTime || ""}
             onChange={handleEndTimeChange}
             className="w-full"
+            placeholder="Fin"
           />
         </div>
       </TableCell>

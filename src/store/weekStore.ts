@@ -78,20 +78,46 @@ const useWeekStore = create<WeekStore>((set, get) => ({
       // Récupérer les valeurs de startTime et endTime (soit des nouvelles valeurs, soit des valeurs existantes)
       const startTime = dayData.startTime || updatedDays[dayIndex].startTime;
       const endTime = dayData.endTime || updatedDays[dayIndex].endTime;
+      const lunchBreakStart = dayData.lunchBreakStart || updatedDays[dayIndex].lunchBreakStart;
+      const lunchBreakEnd = dayData.lunchBreakEnd || updatedDays[dayIndex].lunchBreakEnd;
       
       // Calculer la durée si startTime et endTime sont tous les deux définis
       if (startTime && endTime) {
-        const start = new Date(`1970-01-01T${startTime}:00`);
-        const end = new Date(`1970-01-01T${endTime}:00`);
-
-        // Si l'heure de fin est avant l'heure de début, ajouter 24h
-        let diff = end.getTime() - start.getTime();
-        if (diff < 0) {
-          diff += 24 * 60 * 60 * 1000;
+        // Convertir les heures en minutes depuis minuit
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [endHour, endMinute] = endTime.split(':').map(Number);
+        
+        const startMinutes = startHour * 60 + startMinute;
+        let endMinutes = endHour * 60 + endMinute;
+        
+        // Si l'heure de fin est avant l'heure de début, on ajoute 24h (pour les horaires qui passent minuit)
+        if (endMinutes < startMinutes) {
+          endMinutes += 24 * 60;
         }
-
-        // Convertir en heures et arrondir à 2 décimales
-        const hours = Math.round((diff / (1000 * 60 * 60)) * 100) / 100;
+        
+        // Calculer la durée totale sans pause
+        let totalMinutes = endMinutes - startMinutes;
+        
+        // Soustraire la pause méridienne si elle est définie
+        if (lunchBreakStart && lunchBreakEnd) {
+          const [lunchStartHour, lunchStartMinute] = lunchBreakStart.split(':').map(Number);
+          const [lunchEndHour, lunchEndMinute] = lunchBreakEnd.split(':').map(Number);
+          
+          const lunchStartMinutes = lunchStartHour * 60 + lunchStartMinute;
+          let lunchEndMinutes = lunchEndHour * 60 + lunchEndMinute;
+          
+          // Si l'heure de fin de pause est avant l'heure de début de pause, on ajoute 24h
+          if (lunchEndMinutes < lunchStartMinutes) {
+            lunchEndMinutes += 24 * 60;
+          }
+          
+          // Soustraire la durée de la pause
+          const breakDuration = lunchEndMinutes - lunchStartMinutes;
+          totalMinutes -= breakDuration;
+        }
+        
+        // Calculer la différence en heures (arrondie à 2 décimales)
+        const hours = Math.round(totalMinutes / 60 * 100) / 100;
         updatedDays[dayIndex].calculatedDuration = hours;
         updatedDays[dayIndex].isWorked = hours > 0;
       }
@@ -186,6 +212,8 @@ const useWeekStore = create<WeekStore>((set, get) => ({
         data.jour = new Intl.DateTimeFormat("fr-FR", options).format(date);
       }
       if (columns.includes("debut")) data.debut = day.startTime || "";
+      if (columns.includes("pauseDebut")) data.pauseDebut = day.lunchBreakStart || "";
+      if (columns.includes("pauseFin")) data.pauseFin = day.lunchBreakEnd || "";
       if (columns.includes("fin")) data.fin = day.endTime || "";
       if (columns.includes("duree")) data.duree = day.calculatedDuration;
 
