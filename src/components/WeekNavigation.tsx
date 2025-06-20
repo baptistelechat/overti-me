@@ -1,8 +1,8 @@
 import React from "react";
 import useWeekStore from "../store/weekStore";
-import { getNextWeekId, getPreviousWeekId, getWeekId } from "../utils/dateUtils";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { getNextWeekId, getPreviousWeekId, getWeekId } from "@/utils/date/weekId";
 
 interface WeekNavigationProps {
   weekId: string;

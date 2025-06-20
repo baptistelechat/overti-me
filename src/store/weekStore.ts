@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import type { WeekData, WorkDay } from "../types";
 import { NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "../types";
-import { getWeekDates, getWeekId } from "../utils/dateUtils";
+import { getWeekId } from "@/utils/date/weekId";
+import { getWeekDates } from "@/utils/date/weekDates";
+
 
 interface WeekStore {
   // État
