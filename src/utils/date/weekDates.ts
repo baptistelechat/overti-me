@@ -41,15 +41,6 @@ export const getWeekDates = (weekId: string): Date[] => {
 
     // Générer les dates pour chaque jour de la semaine (lundi à dimanche)
     const weekDates: Date[] = [];
-    const dayNames = [
-      "Lundi",
-      "Mardi",
-      "Mercredi",
-      "Jeudi",
-      "Vendredi",
-      "Samedi",
-      "Dimanche",
-    ];
 
     for (let i = 0; i < 7; i++) {
       const currentDate = addDays(mondayOfWeek, i);

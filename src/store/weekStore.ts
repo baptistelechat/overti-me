@@ -75,10 +75,14 @@ const useWeekStore = create<WeekStore>((set, get) => ({
       const updatedDays = [...currentWeek.days];
       updatedDays[dayIndex] = { ...updatedDays[dayIndex], ...dayData };
 
-      // Calculer la durée si startTime et endTime sont définis
-      if (dayData.startTime && dayData.endTime) {
-        const start = new Date(`1970-01-01T${dayData.startTime}:00`);
-        const end = new Date(`1970-01-01T${dayData.endTime}:00`);
+      // Récupérer les valeurs de startTime et endTime (soit des nouvelles valeurs, soit des valeurs existantes)
+      const startTime = dayData.startTime || updatedDays[dayIndex].startTime;
+      const endTime = dayData.endTime || updatedDays[dayIndex].endTime;
+      
+      // Calculer la durée si startTime et endTime sont tous les deux définis
+      if (startTime && endTime) {
+        const start = new Date(`1970-01-01T${startTime}:00`);
+        const end = new Date(`1970-01-01T${endTime}:00`);
 
         // Si l'heure de fin est avant l'heure de début, ajouter 24h
         let diff = end.getTime() - start.getTime();
@@ -90,10 +94,6 @@ const useWeekStore = create<WeekStore>((set, get) => ({
         const hours = Math.round((diff / (1000 * 60 * 60)) * 100) / 100;
         updatedDays[dayIndex].calculatedDuration = hours;
         updatedDays[dayIndex].isWorked = hours > 0;
-      } else if (dayData.duration !== undefined) {
-        // Si la durée est directement saisie
-        updatedDays[dayIndex].calculatedDuration = dayData.duration;
-        updatedDays[dayIndex].isWorked = dayData.duration > 0;
       }
 
       // Mettre à jour la semaine
