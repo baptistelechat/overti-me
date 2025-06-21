@@ -1,7 +1,8 @@
 import React from "react";
-import { type WeekData } from "../types";
+import { type WeekData, NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "../types";
 import { Card, CardContent } from "./ui/card";
 import { Progress } from "./ui/progress";
+import { cn } from "@/lib/utils";
 
 interface WeekSummaryProps {
   weekData: WeekData;
@@ -14,6 +15,14 @@ const WeekSummary: React.FC<WeekSummaryProps> = ({ weekData }) => {
     weekData.overtimeHours25 * 1.25 +
     weekData.overtimeHours50 * 1.5
   ).toFixed(2);
+  
+  // Vérifier si le total dépasse 48h (limite légale)
+  const isOverLegalLimit = weekData.totalHours > 48;
+  
+  // Constantes pour les maximums des barres de progression
+  const NORMAL_HOURS_MAX = NORMAL_HOURS_THRESHOLD; // 35h
+  const OVERTIME_25_MAX = OVERTIME_25_THRESHOLD - NORMAL_HOURS_THRESHOLD; // 8h (43h - 35h)
+  const OVERTIME_50_MAX = 5; // 5h maximum pour les heures majorées à 50%
 
   return (
     <div>
@@ -32,7 +41,7 @@ const WeekSummary: React.FC<WeekSummaryProps> = ({ weekData }) => {
               </span>
             </div>
             <Progress 
-              value={(weekData.normalHours / weekData.totalHours) * 100} 
+              value={Math.min((weekData.normalHours / NORMAL_HOURS_MAX) * 100, 100)} 
               className="h-2 bg-muted" 
               indicatorClassName="bg-green-500"
             />
@@ -46,7 +55,7 @@ const WeekSummary: React.FC<WeekSummaryProps> = ({ weekData }) => {
               </span>
             </div>
             <Progress 
-              value={(weekData.overtimeHours25 / weekData.totalHours) * 100} 
+              value={Math.min((weekData.overtimeHours25 / OVERTIME_25_MAX) * 100, 100)} 
               className="h-2 bg-muted" 
               indicatorClassName="bg-yellow-500"
             />
@@ -54,13 +63,13 @@ const WeekSummary: React.FC<WeekSummaryProps> = ({ weekData }) => {
 
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted-foreground">Heures majorées (+50%)</span>
-              <span className="font-medium">
+              <span className={cn("text-muted-foreground", weekData.overtimeHours50 > OVERTIME_50_MAX && "text-destructive")}>Heures majorées (+50%)</span>
+              <span className={cn("font-medium", weekData.overtimeHours50 > OVERTIME_50_MAX && "text-destructive")}>
                 {weekData.overtimeHours50.toFixed(2)}h
               </span>
             </div>
             <Progress 
-              value={(weekData.overtimeHours50 / weekData.totalHours) * 100} 
+              value={Math.min((weekData.overtimeHours50 / OVERTIME_50_MAX) * 100, 100)} 
               className="h-2 bg-muted" 
               indicatorClassName="bg-red-500"
             />
@@ -74,14 +83,17 @@ const WeekSummary: React.FC<WeekSummaryProps> = ({ weekData }) => {
               <div className="text-muted-foreground mb-1">
                 Total des heures travaillées
               </div>
-              <div className="text-3xl font-bold">
+              <div className={cn("text-3xl font-bold", isOverLegalLimit && "text-destructive")}>
                 {weekData.totalHours.toFixed(2)}h
+                {isOverLegalLimit && (
+                  <span className="text-sm ml-2">(+{(weekData.totalHours - 48).toFixed(2)}h)</span>
+                )}
               </div>
             </div>
 
             <div className="mb-4">
               <div className="text-muted-foreground mb-1">Total avec majoration</div>
-              <div className="text-3xl font-bold text-primary">
+              <div className={cn("text-3xl font-bold text-primary", isOverLegalLimit && "text-destructive")}>
                 {totalWithOvertime}h
               </div>
             </div>
