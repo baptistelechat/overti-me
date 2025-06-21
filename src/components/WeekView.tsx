@@ -5,8 +5,6 @@ import React, { useEffect } from "react";
 import useWeekStore from "../store/weekStore";
 import DayRow from "./DayRow";
 import ExportOptions from "./ExportOptions";
-import WeekNavigation from "./WeekNavigation";
-import WeekSummary from "./WeekSummary";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
@@ -18,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import WeekNavigation from "./WeekNavigation";
+import WeekSummary from "./WeekSummary";
 
 const WeekView: React.FC = () => {
   // Récupérer les données et actions du store
@@ -142,9 +142,9 @@ const WeekView: React.FC = () => {
       {/* Bouton de réinitialisation - visible uniquement si des heures sont enregistrées */}
       {currentWeek.totalHours > 0 && (
         <div className="mt-6 text-center">
-          <Button 
-            onClick={resetWeek} 
-            variant="outline" 
+          <Button
+            onClick={resetWeek}
+            variant="outline"
             className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
             <Trash2Icon className="h-4 w-4 mr-2" />
