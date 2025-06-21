@@ -1,5 +1,10 @@
 import React from "react";
 import type { WorkDay } from "../types";
+import { DAILY_HOURS_THRESHOLD } from "../constants/hoursThreshold";
+import { cn } from "../lib/utils";
+import { Trash2Icon } from "lucide-react";
+import useWeekStore from "../store/weekStore";
+import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { TableCell, TableRow } from "./ui/table";
@@ -11,6 +16,9 @@ interface DayRowProps {
 }
 
 const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
+  // Récupérer la fonction resetDay du store
+  const resetDay = useWeekStore((state) => state.resetDay);
+  
   // Formater la date pour l'affichage
   const date = new Date(day.date);
   const dayName = date.toLocaleDateString("fr-FR", { weekday: "long" });
@@ -18,6 +26,11 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
     day: "2-digit",
     month: "2-digit",
   });
+  
+  // Gérer la réinitialisation du jour
+  const handleResetDay = () => {
+    resetDay(dayIndex);
+  };
 
   // Gérer le changement d'heure de début
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,10 +136,29 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
       </TableCell>
 
       {/* Durée calculée (en lecture seule) */}
-      <TableCell>
-        <span className="font-medium">
+      <TableCell className="text-center">
+        <span className={cn(
+          "font-medium",
+          day.calculatedDuration > DAILY_HOURS_THRESHOLD && "text-destructive"
+        )}>
           {day.calculatedDuration.toFixed(2)}h
         </span>
+      </TableCell>
+      
+      {/* Actions */}
+      <TableCell className="text-center">
+        {(day.startTime || day.endTime || day.lunchBreakStart || day.lunchBreakEnd) && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-5 hover:bg-destructive/10 transition-colors"
+            onClick={handleResetDay}
+            title="Réinitialiser ce jour"
+            aria-label="Réinitialiser ce jour"
+          >
+            <Trash2Icon className="h-3 w-3" />
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );

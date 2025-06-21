@@ -1,3 +1,6 @@
+import { OVERTIME_50_THRESHOLD } from "@/constants/hoursThreshold";
+import { cn } from "@/lib/utils";
+import { Trash2Icon } from "lucide-react";
 import React, { useEffect } from "react";
 import useWeekStore from "../store/weekStore";
 import DayRow from "./DayRow";
@@ -6,7 +9,15 @@ import WeekNavigation from "./WeekNavigation";
 import WeekSummary from "./WeekSummary";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "./ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 
 const WeekView: React.FC = () => {
   // Récupérer les données et actions du store
@@ -50,13 +61,18 @@ const WeekView: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30">
-                  <TableHead className="w-[15%] text-center">Jour</TableHead>
-                  <TableHead className="w-[15%] text-center">Date</TableHead>
-                  <TableHead className="w-[14%] text-center">Début</TableHead>
-                  <TableHead className="w-[14%] text-center">Début pause</TableHead>
-                  <TableHead className="w-[14%] text-center">Fin pause</TableHead>
-                  <TableHead className="w-[14%] text-center">Fin</TableHead>
-                  <TableHead className="w-[14%] text-center">Durée</TableHead>
+                  <TableHead className="w-[14%] text-center">Jour</TableHead>
+                  <TableHead className="w-[12%] text-center">Date</TableHead>
+                  <TableHead className="w-[13%] text-center">Début</TableHead>
+                  <TableHead className="w-[13%] text-center">
+                    Début pause
+                  </TableHead>
+                  <TableHead className="w-[13%] text-center">
+                    Fin pause
+                  </TableHead>
+                  <TableHead className="w-[13%] text-center">Fin</TableHead>
+                  <TableHead className="w-[13%] text-center">Durée</TableHead>
+                  <TableHead className="w-[9%] text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -70,6 +86,44 @@ const WeekView: React.FC = () => {
                   />
                 ))}
               </TableBody>
+              <TableFooter>
+                <TableRow
+                  className={cn(
+                    currentWeek.totalHours > OVERTIME_50_THRESHOLD &&
+                      "text-destructive"
+                  )}
+                >
+                  <TableCell colSpan={6} className="font-semibold text-right">
+                    <span>Total des heures travaillées</span>
+                  </TableCell>
+                  <TableCell className={cn("font-bold text-center")}>
+                    {currentWeek.totalHours.toFixed(2)}h
+                    {currentWeek.totalHours > OVERTIME_50_THRESHOLD && (
+                      <span className="text-sm ml-1">
+                        (+
+                        {(
+                          currentWeek.totalHours - OVERTIME_50_THRESHOLD
+                        ).toFixed(2)}
+                        h)
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {currentWeek.totalHours > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-5 hover:bg-destructive/10 transition-colors"
+                        onClick={resetWeek}
+                        title="Réinitialiser la semaine"
+                        aria-label="Réinitialiser la semaine"
+                      >
+                        <Trash2Icon className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </div>
         </CardContent>
@@ -85,12 +139,19 @@ const WeekView: React.FC = () => {
       {/* Options d'export */}
       <ExportOptions />
 
-      {/* Bouton de réinitialisation */}
-      <div className="mt-6 text-center">
-        <Button onClick={resetWeek} variant="destructive">
-          Réinitialiser la semaine
-        </Button>
-      </div>
+      {/* Bouton de réinitialisation - visible uniquement si des heures sont enregistrées */}
+      {currentWeek.totalHours > 0 && (
+        <div className="mt-6 text-center">
+          <Button 
+            onClick={resetWeek} 
+            variant="outline" 
+            className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2Icon className="h-4 w-4 mr-2" />
+            Réinitialiser toutes les données de la semaine
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
