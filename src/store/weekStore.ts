@@ -3,7 +3,7 @@ import { getWeekId } from "@/utils/date/weekId";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { WeekData, WorkDay } from "../types";
-import { NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "../types";
+import { NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "@/constants/hoursThreshold";
 
 interface WeekStore {
   // État
