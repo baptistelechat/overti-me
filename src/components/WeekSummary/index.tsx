@@ -85,4 +85,4 @@ const WeekSummary: React.FC<WeekSummaryProps> = ({ weekData }) => {
   );
 };
 
-export default WeekSummary;
+export default WeekSummary
