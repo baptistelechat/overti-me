@@ -28,6 +28,3 @@ export const weekDataSchema = z.object({
 export type WorkDay = z.infer<typeof workDaySchema>;
 export type WeekData = z.infer<typeof weekDataSchema>;
 
-// Constantes pour les calculs d'heures supplémentaires
-export const NORMAL_HOURS_THRESHOLD = 35; // Seuil des heures normales
-export const OVERTIME_25_THRESHOLD = 43; // Seuil des heures supp à +25%

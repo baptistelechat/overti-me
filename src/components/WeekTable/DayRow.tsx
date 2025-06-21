@@ -1,24 +1,29 @@
 import React from "react";
-import type { WorkDay } from "../types";
-import { DAILY_HOURS_THRESHOLD } from "../constants/hoursThreshold";
-import { cn } from "../lib/utils";
+import type { WorkDay } from "../../types";
+import { DAILY_HOURS_THRESHOLD } from "@/constants/hoursThreshold";
+import { cn } from "@/lib/utils";
 import { Trash2Icon } from "lucide-react";
-import useWeekStore from "../store/weekStore";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { TableCell, TableRow } from "./ui/table";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { TableCell, TableRow } from "../ui/table";
 
 interface DayRowProps {
   day: WorkDay;
   dayIndex: number;
   onUpdate: (data: Partial<WorkDay>) => void;
+  onReset: (dayIndex: number) => void;
 }
 
-const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
-  // Récupérer la fonction resetDay du store
-  const resetDay = useWeekStore((state) => state.resetDay);
-  
+/**
+ * Composant représentant une ligne du tableau pour un jour de la semaine
+ */
+export const DayRow: React.FC<DayRowProps> = ({ 
+  day, 
+  dayIndex, 
+  onUpdate, 
+  onReset 
+}) => {
   // Formater la date pour l'affichage
   const date = new Date(day.date);
   const dayName = date.toLocaleDateString("fr-FR", { weekday: "long" });
@@ -29,7 +34,7 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
   
   // Gérer la réinitialisation du jour
   const handleResetDay = () => {
-    resetDay(dayIndex);
+    onReset(dayIndex);
   };
 
   // Gérer le changement d'heure de début
@@ -70,11 +75,11 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
       {/* Heure de début */}
       <TableCell>
         <div className="space-y-1">
-          <Label htmlFor="start-time" className="sr-only">
+          <Label htmlFor={`start-time-${dayIndex}`} className="sr-only">
             Heure de début
           </Label>
           <Input
-            id="start-time"
+            id={`start-time-${dayIndex}`}
             type="time"
             value={day.startTime || ""}
             onChange={handleStartTimeChange}
@@ -87,11 +92,11 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
       {/* Début pause méridienne */}
       <TableCell>
         <div className="space-y-1">
-          <Label htmlFor="lunch-break-start" className="sr-only">
+          <Label htmlFor={`lunch-break-start-${dayIndex}`} className="sr-only">
             Début pause
           </Label>
           <Input
-            id="lunch-break-start"
+            id={`lunch-break-start-${dayIndex}`}
             type="time"
             value={day.lunchBreakStart || ""}
             onChange={handleLunchBreakStartChange}
@@ -104,11 +109,11 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
       {/* Fin pause méridienne */}
       <TableCell>
         <div className="space-y-1">
-          <Label htmlFor="lunch-break-end" className="sr-only">
+          <Label htmlFor={`lunch-break-end-${dayIndex}`} className="sr-only">
             Fin pause
           </Label>
           <Input
-            id="lunch-break-end"
+            id={`lunch-break-end-${dayIndex}`}
             type="time"
             value={day.lunchBreakEnd || ""}
             onChange={handleLunchBreakEndChange}
@@ -121,11 +126,11 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
       {/* Heure de fin */}
       <TableCell>
         <div className="space-y-1">
-          <Label htmlFor="end-time" className="sr-only">
+          <Label htmlFor={`end-time-${dayIndex}`} className="sr-only">
             Heure de fin
           </Label>
           <Input
-            id="end-time"
+            id={`end-time-${dayIndex}`}
             type="time"
             value={day.endTime || ""}
             onChange={handleEndTimeChange}
@@ -163,5 +168,3 @@ const DayRow: React.FC<DayRowProps> = ({ day, dayIndex, onUpdate }) => {
     </TableRow>
   );
 };
-
-export default DayRow;

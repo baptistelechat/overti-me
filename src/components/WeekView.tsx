@@ -1,16 +1,16 @@
+import { Trash2Icon } from "lucide-react";
 import React, { useEffect } from "react";
 import useWeekStore from "../store/weekStore";
-import DayRow from "./DayRow";
 import ExportOptions from "./ExportOptions";
-import WeekNavigation from "./WeekNavigation";
-import WeekSummary from "./WeekSummary";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "./ui/table";
+import WeekNavigation from "./WeekNavigation";
+import WeekSummary from "./WeekSummary";
+import WeekTable from "./WeekTable";
 
 const WeekView: React.FC = () => {
   // Récupérer les données et actions du store
-  const { currentWeekId, weeks, initializeWeek, updateDay, resetWeek } =
+  const { currentWeekId, weeks, initializeWeek, updateDay, resetDay, resetWeek } =
     useWeekStore();
 
   // Initialiser la semaine au chargement du composant
@@ -46,32 +46,12 @@ const WeekView: React.FC = () => {
         </CardHeader>
         <CardContent className="p-0">
           {/* Tableau des jours */}
-          <div className="overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/30">
-                  <TableHead className="w-[15%] text-center">Jour</TableHead>
-                  <TableHead className="w-[15%] text-center">Date</TableHead>
-                  <TableHead className="w-[14%] text-center">Début</TableHead>
-                  <TableHead className="w-[14%] text-center">Début pause</TableHead>
-                  <TableHead className="w-[14%] text-center">Fin pause</TableHead>
-                  <TableHead className="w-[14%] text-center">Fin</TableHead>
-                  <TableHead className="w-[14%] text-center">Durée</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {/* Lignes pour chaque jour de la semaine */}
-                {currentWeek.days.map((day, index) => (
-                  <DayRow
-                    key={day.date}
-                    day={day}
-                    dayIndex={index}
-                    onUpdate={(data) => updateDay(index, data)}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <WeekTable
+            weekData={currentWeek}
+            onUpdateDay={updateDay}
+            onResetDay={resetDay}
+            onResetWeek={resetWeek}
+          />
         </CardContent>
       </Card>
 
@@ -85,12 +65,19 @@ const WeekView: React.FC = () => {
       {/* Options d'export */}
       <ExportOptions />
 
-      {/* Bouton de réinitialisation */}
-      <div className="mt-6 text-center">
-        <Button onClick={resetWeek} variant="destructive">
-          Réinitialiser la semaine
-        </Button>
-      </div>
+      {/* Bouton de réinitialisation - visible uniquement si des heures sont enregistrées */}
+      {currentWeek.totalHours > 0 && (
+        <div className="mt-6 text-center">
+          <Button
+            onClick={resetWeek}
+            variant="outline"
+            className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2Icon className="h-4 w-4 mr-2" />
+            Réinitialiser toutes les données de la semaine
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

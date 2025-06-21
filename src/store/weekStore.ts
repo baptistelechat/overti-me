@@ -3,7 +3,7 @@ import { getWeekId } from "@/utils/date/weekId";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { WeekData, WorkDay } from "../types";
-import { NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "../types";
+import { NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "@/constants/hoursThreshold";
 
 interface WeekStore {
   // État
@@ -16,6 +16,7 @@ interface WeekStore {
   updateDay: (dayIndex: number, dayData: Partial<WorkDay>) => void;
   calculateTotals: () => void;
   resetWeek: () => void;
+  resetDay: (dayIndex: number) => void;
   exportWeekData: (format: "json" | "csv" | "xlsx", columns: string[]) => void;
 }
 
@@ -246,6 +247,45 @@ const useWeekStore = create<WeekStore>()(
 
         // Réinitialiser avec une nouvelle semaine vide
         get().initializeWeek(currentWeekId);
+      },
+
+      // Réinitialiser un jour spécifique
+      resetDay: (dayIndex) => {
+        const { currentWeekId, weeks, calculateTotals } = get();
+        const currentWeek = weeks[currentWeekId];
+
+        if (currentWeek && dayIndex >= 0 && dayIndex < currentWeek.days.length) {
+          // Récupérer la date du jour à réinitialiser
+          const dateToKeep = currentWeek.days[dayIndex].date;
+          
+          // Créer un jour vide avec la même date
+          const resetDay: WorkDay = {
+            date: dateToKeep,
+            startTime: "",
+            endTime: "",
+            lunchBreakStart: "",
+            lunchBreakEnd: "",
+            calculatedDuration: 0,
+            isWorked: false
+          };
+
+          // Mettre à jour le jour spécifié
+          const updatedDays = [...currentWeek.days];
+          updatedDays[dayIndex] = resetDay;
+
+          set((state) => ({
+            weeks: {
+              ...state.weeks,
+              [currentWeekId]: {
+                ...currentWeek,
+                days: updatedDays,
+              },
+            },
+          }));
+
+          // Recalculer les totaux
+          calculateTotals();
+        }
       },
 
       // Exporter les données de la semaine
