@@ -24,14 +24,12 @@ import {
 } from "../ui/drawer";
 import { ExportButton } from "./ExportButton";
 import { ExportContent } from "./ExportContent";
-import { useExportStore } from "../../store/exportStore";
 
 /**
  * Composant principal d'exportation des données de la semaine
  */
 const WeekExport: React.FC = () => {
   const { currentWeekId } = useWeekStore();
-  const { selectedColumns } = useExportStore();
 
   // Utiliser le hook useMediaQuery pour détecter les écrans moyens et grands
   const isMediumScreen = useMediaQuery("(min-width: 768px)");

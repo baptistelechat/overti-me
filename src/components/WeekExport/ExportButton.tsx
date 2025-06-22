@@ -6,12 +6,12 @@ import { useExportStore } from "../../store/exportStore";
  * Composant pour le bouton d'exportation
  */
 export const ExportButton: React.FC = () => {
-  const { selectedColumns, handleExport } = useExportStore();
+  const { selectedColumns, selectedFormats, handleExport } = useExportStore();
 
   return (
     <Button
       onClick={handleExport}
-      disabled={selectedColumns.length === 0}
+      disabled={selectedColumns.length === 0 || selectedFormats.length === 0}
       variant="default"
       className="bg-green-500 hover:bg-green-600"
     >
