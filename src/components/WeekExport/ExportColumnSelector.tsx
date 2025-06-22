@@ -1,23 +1,23 @@
+import { CheckSquare, Square } from "lucide-react";
 import React, { useMemo } from "react";
+import useMediaQuery from "../../hooks/useMediaQuery";
+import { useExportStore } from "../../store/exportStore";
+import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
-import { Button } from "../ui/button";
-import { CheckSquare, Square } from "lucide-react";
-import { useExportStore } from "../../store/exportStore";
-import useMediaQuery from "../../hooks/useMediaQuery";
 
 /**
  * Composant pour la sélection des colonnes à exporter
  */
 export const ExportColumnSelector: React.FC = () => {
-  const { 
-    selectedColumns, 
-    columnOptions, 
-    handleColumnChange, 
-    selectAllColumns, 
-    deselectAllColumns 
+  const {
+    selectedColumns,
+    columnOptions,
+    handleColumnChange,
+    selectAllColumns,
+    deselectAllColumns,
   } = useExportStore();
-  
+
   // Détermine si toutes les colonnes sont sélectionnées
   const areAllColumnsSelected = useMemo(() => {
     return columnOptions.length === selectedColumns.length;
@@ -28,17 +28,24 @@ export const ExportColumnSelector: React.FC = () => {
     <div>
       <div className="flex items-center mb-3">
         <div className="mr-3">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={areAllColumnsSelected ? deselectAllColumns : selectAllColumns}
-            className="h-7 w-7"
-            title={areAllColumnsSelected ? "Tout désélectionner" : "Tout sélectionner"}
-          >
-            {areAllColumnsSelected ? 
-              <Square className="h-4 w-4" /> : 
-              <CheckSquare className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={
+              areAllColumnsSelected ? deselectAllColumns : selectAllColumns
             }
+            className="h-7 w-7"
+            title={
+              areAllColumnsSelected
+                ? "Tout désélectionner"
+                : "Tout sélectionner"
+            }
+          >
+            {areAllColumnsSelected ? (
+              <CheckSquare className="h-4 w-4" />
+            ) : (
+              <Square className="h-4 w-4" />
+            )}
           </Button>
         </div>
         <h4 className="font-medium">Colonnes à inclure</h4>

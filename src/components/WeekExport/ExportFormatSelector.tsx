@@ -1,17 +1,23 @@
-import React, { useMemo } from "react";
-import { Label } from "../ui/label";
-import { Checkbox } from "../ui/checkbox";
-import { Button } from "../ui/button";
 import { CheckSquare, Square } from "lucide-react";
+import React, { useMemo } from "react";
 import { useExportStore } from "../../store/exportStore";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
 
 /**
  * Composant pour la sélection du format d'exportation
  * Permet de sélectionner plusieurs formats à la fois
  */
 export const ExportFormatSelector: React.FC = () => {
-  const { selectedFormats, formatOptions, handleFormatChange, selectAllFormats, deselectAllFormats } = useExportStore();
-  
+  const {
+    selectedFormats,
+    formatOptions,
+    handleFormatChange,
+    selectAllFormats,
+    deselectAllFormats,
+  } = useExportStore();
+
   // Détermine si tous les formats sont sélectionnés
   const areAllFormatsSelected = useMemo(() => {
     return formatOptions.length === selectedFormats.length;
@@ -21,18 +27,25 @@ export const ExportFormatSelector: React.FC = () => {
     <div>
       <div className="flex items-center mb-3">
         <div className="mr-3">
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="icon" 
-            onClick={areAllFormatsSelected ? deselectAllFormats : selectAllFormats}
-            className="h-7 w-7"
-            title={areAllFormatsSelected ? "Tout désélectionner" : "Tout sélectionner"}
-          >
-            {areAllFormatsSelected ? 
-              <Square className="h-4 w-4" /> : 
-              <CheckSquare className="h-4 w-4" />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={
+              areAllFormatsSelected ? deselectAllFormats : selectAllFormats
             }
+            className="h-7 w-7"
+            title={
+              areAllFormatsSelected
+                ? "Tout désélectionner"
+                : "Tout sélectionner"
+            }
+          >
+            {areAllFormatsSelected ? (
+              <CheckSquare className="h-4 w-4" />
+            ) : (
+              <Square className="h-4 w-4" />
+            )}
           </Button>
         </div>
         <h4 className="font-medium">Format(s)</h4>
