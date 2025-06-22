@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import useWeekStore from "../store/weekStore";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 const ExportOptions: React.FC = () => {
   const { currentWeekId, weeks } = useWeekStore();
@@ -16,26 +16,28 @@ const ExportOptions: React.FC = () => {
     "xlsx"
   );
   const [selectedColumns, setSelectedColumns] = useState<string[]>([
-    "date",
-    "jour",
-    "debut",
-    "pauseDebut",
-    "pauseFin",
-    "fin",
-    "duree",
-    "totaux",
+    "Jour",
+    "Date",
+    "Debut",
+    "PauseDebut",
+    "PauseFin",
+    "Fin",
+    "Duree",
+    "Totaux",
+    "Majorations",
   ]);
 
   // Options de colonnes disponibles
   const columnOptions = [
-    { id: "date", label: "Date (YYYY-MM-DD)" },
-    { id: "jour", label: "Jour de la semaine" },
-    { id: "debut", label: "Heure de début" },
-    { id: "pauseDebut", label: "Début pause" },
-    { id: "pauseFin", label: "Fin pause" },
-    { id: "fin", label: "Heure de fin" },
-    { id: "duree", label: "Durée (heures)" },
-    { id: "totaux", label: "Totaux et majorations" },
+    { id: "Jour", label: "Jour de la semaine" },
+    { id: "Date", label: "Date (JJ/MM/AAAA)" },
+    { id: "Debut", label: "Heure de début" },
+    { id: "PauseDebut", label: "Début pause" },
+    { id: "PauseFin", label: "Fin pause" },
+    { id: "Fin", label: "Heure de fin" },
+    { id: "Duree", label: "Durée (heures)" },
+    { id: "Totaux", label: "Totaux" },
+    { id: "Majorations", label: "Majorations" },
   ];
 
   // Gérer le changement de sélection des colonnes
@@ -56,40 +58,75 @@ const ExportOptions: React.FC = () => {
       const data: Record<string, any> = {};
 
       // Filtrer les colonnes selon la sélection
-      if (selectedColumns.includes("date")) data.date = day.date;
-      if (selectedColumns.includes("jour")) {
+      if (selectedColumns.includes("Jour")) {
         const date = new Date(day.date);
         const options: Intl.DateTimeFormatOptions = { weekday: "long" };
-        data.jour = new Intl.DateTimeFormat("fr-FR", options).format(date);
+        const jour = new Intl.DateTimeFormat("fr-FR", options).format(date);
+        data.Jour = jour.charAt(0).toUpperCase() + jour.slice(1);
       }
-      if (selectedColumns.includes("debut")) data.debut = day.startTime || "";
-      if (selectedColumns.includes("pauseDebut")) data.pauseDebut = day.lunchBreakStart || "";
-      if (selectedColumns.includes("pauseFin")) data.pauseFin = day.lunchBreakEnd || "";
-      if (selectedColumns.includes("fin")) data.fin = day.endTime || "";
-      if (selectedColumns.includes("duree"))
-        data.duree = day.calculatedDuration;
+      if (selectedColumns.includes("Date")) {
+        const date = new Date(day.date);
+        data.Date = date.toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      }
+      if (selectedColumns.includes("Debut")) data.Debut = day.startTime || "";
+      if (selectedColumns.includes("PauseDebut"))
+        data.PauseDebut = day.lunchBreakStart || "";
+      if (selectedColumns.includes("PauseFin"))
+        data.PauseFin = day.lunchBreakEnd || "";
+      if (selectedColumns.includes("Fin")) data.Fin = day.endTime || "";
+      if (selectedColumns.includes("Duree"))
+        data.Duree = day.calculatedDuration;
 
       return data;
     });
 
     // Ajouter les totaux si demandé
-    if (selectedColumns.includes("totaux")) {
-      exportData.push({
-        date: "TOTAUX",
-        duree: currentWeek.totalHours,
-      });
-      exportData.push({
-        date: "Heures normales",
-        duree: currentWeek.normalHours,
-      });
-      exportData.push({
-        date: "Heures +25%",
-        duree: currentWeek.overtimeHours25,
-      });
-      exportData.push({
-        date: "Heures +50%",
-        duree: currentWeek.overtimeHours50,
-      });
+    if (
+      selectedColumns.includes("Totaux") ||
+      selectedColumns.includes("Majorations")
+    ) {
+      const totalRow: Record<string, any> = {};
+      const normalRow: Record<string, any> = {};
+      const overtime25Row: Record<string, any> = {};
+      const overtime50Row: Record<string, any> = {};
+
+      // Déterminer quelle colonne utiliser pour les libellés
+      if (selectedColumns.includes("Jour")) {
+        totalRow.Jour = "Totaux";
+        normalRow.Jour = "Heures normales";
+        overtime25Row.Jour = "Heures +25%";
+        overtime50Row.Jour = "Heures +50%";
+      } else if (selectedColumns.includes("Date")) {
+        totalRow.Date = "Totaux";
+        normalRow.Date = "Heures normales";
+        overtime25Row.Date = "Heures +25%";
+        overtime50Row.Date = "Heures +50%";
+      }
+
+      if (selectedColumns.includes("Duree")) {
+        totalRow.Duree = currentWeek.totalHours;
+        normalRow.Duree = currentWeek.normalHours;
+      }
+
+      // Ajouter le total général si l'option Totaux est sélectionnée
+      if (selectedColumns.includes("Totaux")) {
+        exportData.push(totalRow);
+        exportData.push(normalRow);
+      }
+
+      // Ajouter les majorations si l'option Majorations est sélectionnée
+      if (selectedColumns.includes("Majorations")) {
+        if (selectedColumns.includes("Duree")) {
+          overtime25Row.Duree = currentWeek.overtimeHours25;
+          overtime50Row.Duree = currentWeek.overtimeHours50;
+        }
+        exportData.push(overtime25Row);
+        exportData.push(overtime50Row);
+      }
     }
 
     // Exporter selon le format demandé
@@ -131,7 +168,9 @@ const ExportOptions: React.FC = () => {
             <h4 className="font-medium mb-3">Format</h4>
             <RadioGroup
               value={exportFormat}
-              onValueChange={(value) => setExportFormat(value as "json" | "csv" | "xlsx")}
+              onValueChange={(value) =>
+                setExportFormat(value as "json" | "csv" | "xlsx")
+              }
               className="flex space-x-4"
             >
               <div className="flex items-center space-x-2">
