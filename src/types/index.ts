@@ -1,12 +1,14 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Schéma Zod pour la validation des données
 export const workDaySchema = z.object({
   date: z.string(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
-  duration: z.number().optional(),
-  // La durée calculée en heures (peut être saisie directement ou calculée à partir de startTime/endTime)
+  // Pause méridienne
+  lunchBreakStart: z.string().optional(),
+  lunchBreakEnd: z.string().optional(),
+  // La durée calculée en heures (calculée à partir de startTime/endTime et pause méridienne)
   calculatedDuration: z.number().default(0),
   // Indique si le jour est travaillé
   isWorked: z.boolean().default(false),
@@ -26,6 +28,3 @@ export const weekDataSchema = z.object({
 export type WorkDay = z.infer<typeof workDaySchema>;
 export type WeekData = z.infer<typeof weekDataSchema>;
 
-// Constantes pour les calculs d'heures supplémentaires
-export const NORMAL_HOURS_THRESHOLD = 35; // Seuil des heures normales
-export const OVERTIME_25_THRESHOLD = 43; // Seuil des heures supp à +25%
