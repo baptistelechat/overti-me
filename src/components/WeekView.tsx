@@ -1,17 +1,23 @@
 import { Trash2Icon } from "lucide-react";
 import React, { useEffect } from "react";
 import useWeekStore from "../store/weekStore";
-import ExportOptions from "./ExportOptions";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import WeekExport from "./WeekExport/index";
 import WeekNavigation from "./WeekNavigation";
 import WeekSummary from "./WeekSummary";
 import WeekTable from "./WeekTable";
 
 const WeekView: React.FC = () => {
   // Récupérer les données et actions du store
-  const { currentWeekId, weeks, initializeWeek, updateDay, resetDay, resetWeek } =
-    useWeekStore();
+  const {
+    currentWeekId,
+    weeks,
+    initializeWeek,
+    updateDay,
+    resetDay,
+    resetWeek,
+  } = useWeekStore();
 
   // Initialiser la semaine au chargement du composant
   useEffect(() => {
@@ -63,7 +69,9 @@ const WeekView: React.FC = () => {
       </Card>
 
       {/* Options d'export */}
-      <ExportOptions />
+      <div className="flex justify-center mb-6">
+        <WeekExport />
+      </div>
 
       {/* Bouton de réinitialisation - visible uniquement si des heures sont enregistrées */}
       {currentWeek.totalHours > 0 && (

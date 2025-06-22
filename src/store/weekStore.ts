@@ -1,9 +1,12 @@
+import {
+  NORMAL_HOURS_THRESHOLD,
+  OVERTIME_25_THRESHOLD,
+} from "@/constants/hoursThreshold";
 import { getWeekDates } from "@/utils/date/weekDates";
 import { getWeekId } from "@/utils/date/weekId";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { WeekData, WorkDay } from "../types";
-import { NORMAL_HOURS_THRESHOLD, OVERTIME_25_THRESHOLD } from "@/constants/hoursThreshold";
 
 interface WeekStore {
   // État
@@ -254,10 +257,14 @@ const useWeekStore = create<WeekStore>()(
         const { currentWeekId, weeks, calculateTotals } = get();
         const currentWeek = weeks[currentWeekId];
 
-        if (currentWeek && dayIndex >= 0 && dayIndex < currentWeek.days.length) {
+        if (
+          currentWeek &&
+          dayIndex >= 0 &&
+          dayIndex < currentWeek.days.length
+        ) {
           // Récupérer la date du jour à réinitialiser
           const dateToKeep = currentWeek.days[dayIndex].date;
-          
+
           // Créer un jour vide avec la même date
           const resetDay: WorkDay = {
             date: dateToKeep,
@@ -266,7 +273,7 @@ const useWeekStore = create<WeekStore>()(
             lunchBreakStart: "",
             lunchBreakEnd: "",
             calculatedDuration: 0,
-            isWorked: false
+            isWorked: false,
           };
 
           // Mettre à jour le jour spécifié
