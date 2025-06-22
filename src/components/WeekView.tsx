@@ -1,7 +1,7 @@
 import { Trash2Icon } from "lucide-react";
 import React, { useEffect } from "react";
 import useWeekStore from "../store/weekStore";
-import ExportOptions from "./ExportOptions";
+import ExportDrawer from "./ExportDrawer";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import WeekNavigation from "./WeekNavigation";
@@ -63,7 +63,9 @@ const WeekView: React.FC = () => {
       </Card>
 
       {/* Options d'export */}
-      <ExportOptions />
+      <div className="flex justify-center mb-6">
+        <ExportDrawer />
+      </div>
 
       {/* Bouton de réinitialisation - visible uniquement si des heures sont enregistrées */}
       {currentWeek.totalHours > 0 && (

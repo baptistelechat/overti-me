@@ -1,15 +1,38 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import useWeekStore from "../store/weekStore";
+import useMediaQuery from "../hooks/useMediaQuery";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Checkbox } from "./ui/checkbox";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./ui/drawer";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
-const ExportOptions: React.FC = () => {
+const ExportDrawer: React.FC = () => {
   const { currentWeekId, weeks } = useWeekStore();
   const currentWeek = weeks[currentWeekId];
+  
+  // Utiliser le hook useMediaQuery pour détecter les écrans moyens et grands
+  const isMediumScreen = useMediaQuery('(min-width: 768px)');
 
   // État pour les options d'export
   const [exportFormat, setExportFormat] = useState<"json" | "csv" | "xlsx">(
@@ -156,70 +179,123 @@ const ExportOptions: React.FC = () => {
     }
   };
 
-  return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Exporter les données</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Format d'export */}
-          <div>
-            <h4 className="font-medium mb-3">Format</h4>
-            <RadioGroup
-              value={exportFormat}
-              onValueChange={(value) =>
-                setExportFormat(value as "json" | "csv" | "xlsx")
-              }
-              className="flex space-x-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="xlsx" id="xlsx" />
-                <Label htmlFor="xlsx">Excel (.xlsx)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="csv" id="csv" />
-                <Label htmlFor="csv">CSV</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="json" id="json" />
-                <Label htmlFor="json">JSON</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {/* Sélection des colonnes */}
-          <div>
-            <h4 className="font-medium mb-3">Colonnes à inclure</h4>
-            <div className="grid grid-cols-2 gap-3">
-              {columnOptions.map((option) => (
-                <div key={option.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={option.id}
-                    checked={selectedColumns.includes(option.id)}
-                    onCheckedChange={() => handleColumnChange(option.id)}
-                  />
-                  <Label htmlFor={option.id}>{option.label}</Label>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Bouton d'export */}
-        <div className="mt-6 text-center">
-          <Button
-            onClick={handleExport}
-            disabled={selectedColumns.length === 0}
-            variant="default"
-            className="bg-green-500 hover:bg-green-600"
+  // Composant interne pour le contenu partagé entre Dialog et Drawer
+  const ExportContent = () => (
+    <>
+      <div className="grid grid-cols-1 gap-6">
+        {/* Format d'export */}
+        <div>
+          <h4 className="font-medium mb-3">Format</h4>
+          <RadioGroup
+            value={exportFormat}
+            onValueChange={(value) =>
+              setExportFormat(value as "json" | "csv" | "xlsx")
+            }
+            className="flex space-x-4"
           >
-            Exporter
-          </Button>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="xlsx" id="xlsx" />
+              <Label htmlFor="xlsx">Excel (.xlsx)</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="csv" id="csv" />
+              <Label htmlFor="csv">CSV</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="json" id="json" />
+              <Label htmlFor="json">JSON</Label>
+            </div>
+          </RadioGroup>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Sélection des colonnes */}
+        <div>
+          <h4 className="font-medium mb-3">Colonnes à inclure</h4>
+          <div className="grid grid-cols-2 gap-3">
+            {columnOptions.map((option) => (
+              <div key={option.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`${option.id}-${isMediumScreen ? 'dialog' : 'drawer'}`}
+                  checked={selectedColumns.includes(option.id)}
+                  onCheckedChange={() => handleColumnChange(option.id)}
+                />
+                <Label htmlFor={`${option.id}-${isMediumScreen ? 'dialog' : 'drawer'}`}>{option.label}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  // Bouton d'export pour Dialog et Drawer
+  const ExportButton = () => (
+    <Button
+      onClick={handleExport}
+      disabled={selectedColumns.length === 0}
+      variant="default"
+      className="bg-green-500 hover:bg-green-600"
+    >
+      Exporter
+    </Button>
+  );
+
+  // Rendu conditionnel en fonction de la taille de l'écran
+  return isMediumScreen ? (
+    // Dialog pour écrans moyens et grands
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="bg-green-500 hover:bg-green-600">
+          Exporter les données
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Exporter les données</DialogTitle>
+          <DialogDescription>
+            Configurez les options d'exportation pour la semaine {currentWeekId}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          <ExportContent />
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Fermer</Button>
+          </DialogClose>
+          <ExportButton />
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ) : (
+    // Drawer pour petits écrans
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button className="bg-green-500 hover:bg-green-600">
+          Exporter les données
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Exporter les données</DrawerTitle>
+          <DrawerDescription>
+            Configurez les options d'exportation pour la semaine {currentWeekId}
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="px-4">
+           <ExportContent />
+          <DrawerFooter className="flex flex-col gap-2">
+            <DrawerClose asChild>
+              <Button variant="outline" className="w-full">
+                Fermer
+              </Button>
+            </DrawerClose>
+            <ExportButton />
+          </DrawerFooter>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
 
-export default ExportOptions;
+export default ExportDrawer;
