@@ -1,4 +1,5 @@
 import useAuthStore from "@/store/authStore";
+import { formatDateTime } from "@/utils/date/formatters";
 import { RefreshCwIcon } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
@@ -13,18 +14,9 @@ const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
   // Si l'utilisateur n'est pas connecté, ne rien afficher
   if (!user) return null;
 
-  const formatLastSyncedAt = () => {
-    if (!lastSyncedAt) return "Jamais";
-
-    const date = new Date(lastSyncedAt);
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(date);
+  // Utilisation des fonctions de formatage centralisées
+  const getFullLastSyncedAt = () => {
+    return formatDateTime(lastSyncedAt);
   };
 
   const getSyncStatusText = () => {
@@ -62,9 +54,11 @@ const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
       <span className={`text-sm font-medium ${getSyncStatusColor()}`}>
         {getSyncStatusText()}
       </span>
-      <span className="text-xs text-muted-foreground">
-        Dernière synchronisation : {formatLastSyncedAt()}
-      </span>
+      {lastSyncedAt && (
+        <span className="text-xs text-muted-foreground">
+          Dernière synchronisation : {getFullLastSyncedAt()}
+        </span>
+      )}
       <div className="flex items-center gap-2">
         <Button
           variant="outline"

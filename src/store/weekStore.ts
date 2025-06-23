@@ -2,6 +2,7 @@ import {
   NORMAL_HOURS_THRESHOLD,
   OVERTIME_25_THRESHOLD,
 } from "@/constants/hoursThreshold";
+import { formatWeekday } from "@/utils/date/formatters";
 import { getWeekDates } from "@/utils/date/weekDates";
 import { getWeekId } from "@/utils/date/weekId";
 import { create } from "zustand";
@@ -382,9 +383,8 @@ const useWeekStore = create<WeekStore>()(
           // Filtrer les colonnes selon la sélection
           if (columns.includes("date")) data.date = day.date;
           if (columns.includes("jour")) {
-            const date = new Date(day.date);
-            const options: Intl.DateTimeFormatOptions = { weekday: "long" };
-            data.jour = new Intl.DateTimeFormat("fr-FR", options).format(date);
+            // Utilisation de la fonction formatWeekday de notre utilitaire centralisé
+            data.jour = formatWeekday(day.date);
           }
           if (columns.includes("debut")) data.debut = day.startTime || "";
           if (columns.includes("pauseDebut"))

@@ -104,7 +104,7 @@ const AuthButton: React.FC = () => {
           className="flex items-center gap-2"
         >
           <CloudIcon className="h-4 w-4 mr-2" />
-          Se connecter
+          Se connecter pour synchroniser
         </Button>
       )}
 

@@ -48,7 +48,7 @@ const createSupabaseClient = () => {
 };
 
 // Créer le store d'authentification avec Zustand
-const useAuthStore = create<AuthState>()(  
+const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       // État initial
@@ -82,12 +82,12 @@ const useAuthStore = create<AuthState>()(
             syncStatus: "not_synced",
           });
 
-          console.log(
-            "Session utilisateur trouvée, démarrage de la synchronisation..."
-          );
+          // console.log(
+          //   "Session utilisateur trouvée, démarrage de la synchronisation..."
+          // );
           // Synchroniser les données immédiatement
           await get().syncWeeks();
-          
+
           // Configurer la synchronisation automatique
           get().setupAutoSync();
         } else {
@@ -96,31 +96,31 @@ const useAuthStore = create<AuthState>()(
 
         // Configurer les listeners pour les changements d'authentification
         supabase.auth.onAuthStateChange(async (event, session) => {
-          console.log("Changement d'état d'authentification:", event);
+          // console.log("Changement d'état d'authentification:", event);
 
           if (event === "SIGNED_IN" && session?.user) {
-            console.log(
-              "Utilisateur connecté, préparation à la synchronisation..."
-            );
+            // console.log(
+            //   "Utilisateur connecté, préparation à la synchronisation..."
+            // );
             set({ user: session.user, syncStatus: "not_synced" });
 
             // Attendre un court instant pour s'assurer que tout est initialisé
             setTimeout(async () => {
-              console.log("Démarrage de la synchronisation après connexion...");
+              // console.log("Démarrage de la synchronisation après connexion...");
               await get().syncWeeks();
-              
+
               // Configurer la synchronisation automatique
               get().setupAutoSync();
             }, 500);
           } else if (event === "SIGNED_OUT") {
-            console.log("Utilisateur déconnecté");
+            // console.log("Utilisateur déconnecté");
             set({
               user: null,
               lastSyncedAt: null,
               syncStatus: "not_synced",
               syncError: null,
             });
-            
+
             // Arrêter la synchronisation automatique
             get().stopAutoSync();
           }
@@ -151,7 +151,7 @@ const useAuthStore = create<AuthState>()(
         const { supabase } = get();
         if (!supabase) return { error: "Supabase client not initialized" };
 
-        console.log("Tentative de connexion...");
+        // console.log("Tentative de connexion...");
         const result = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -162,7 +162,7 @@ const useAuthStore = create<AuthState>()(
           return { error: result.error.message };
         }
 
-        console.log("Connexion réussie, utilisateur:", result.data.user);
+        // console.log("Connexion réussie, utilisateur:", result.data.user);
 
         // Mettre à jour l'état utilisateur manuellement
         set({
@@ -171,13 +171,13 @@ const useAuthStore = create<AuthState>()(
         });
 
         // Forcer une synchronisation immédiate
-        console.log(
-          "Démarrage de la synchronisation après connexion manuelle..."
-        );
+        // console.log(
+        //   "Démarrage de la synchronisation après connexion manuelle..."
+        // );
         setTimeout(async () => {
           try {
             await get().syncWeeks();
-            console.log("Synchronisation après connexion terminée");
+            // console.log("Synchronisation après connexion terminée");
           } catch (error) {
             console.error(
               "Erreur lors de la synchronisation après connexion:",
@@ -210,31 +210,31 @@ const useAuthStore = create<AuthState>()(
       setupAutoSync: () => {
         // Arrêter toute synchronisation automatique existante
         get().stopAutoSync();
-        
+
         // Vérifier si l'utilisateur est connecté
         if (!get().user) return;
-        
+
         // Configurer un intervalle pour synchroniser toutes les 5 minutes (300000 ms)
         const intervalId = window.setInterval(async () => {
-          console.log("Synchronisation automatique déclenchée");
+          // console.log("Synchronisation automatique déclenchée");
           // Ne synchroniser que si l'utilisateur est toujours connecté et qu'on n'est pas déjà en train de synchroniser
           if (get().user && !get().isSyncing) {
             await get().syncWeeks();
           }
         }, 300000); // 5 minutes
-        
+
         // Stocker l'ID de l'intervalle
         set({ autoSyncInterval: intervalId });
-        console.log("Synchronisation automatique configurée");
+        // console.log("Synchronisation automatique configurée");
       },
-      
+
       // Arrêter la synchronisation automatique
       stopAutoSync: () => {
         const intervalId = get().autoSyncInterval;
         if (intervalId !== null) {
           window.clearInterval(intervalId);
           set({ autoSyncInterval: null });
-          console.log("Synchronisation automatique arrêtée");
+          // console.log("Synchronisation automatique arrêtée");
         }
       },
 
@@ -310,10 +310,10 @@ const useAuthStore = create<AuthState>()(
             syncError: null,
           });
 
-          console.log(
-            "Synchronisation terminée, données fusionnées:",
-            mergedWeeks
-          );
+          // console.log(
+          //   "Synchronisation terminée, données fusionnées:",
+          //   mergedWeeks
+          // );
         } catch (error) {
           console.error("Sync error:", error);
           set({
@@ -331,84 +331,79 @@ const useAuthStore = create<AuthState>()(
       updateWeekInSupabase: async (weekData) => {
         const { supabase, user } = get();
         if (!supabase || !user) {
-          console.warn(
-            "Impossible de mettre à jour la semaine: utilisateur non connecté ou client Supabase non initialisé"
-          );
+          // console.warn(
+          //   "Impossible de mettre à jour la semaine: utilisateur non connecté ou client Supabase non initialisé"
+          // );
           return;
         }
 
-        try {
-          console.log(
-            `Mise à jour de la semaine ${weekData.id} dans Supabase...`
+        // console.log(
+        //   `Mise à jour de la semaine ${weekData.id} dans Supabase...`
+        // );
+
+        // Vérifier si la semaine existe déjà
+        const { data: existingWeek, error: checkError } = await supabase
+          .from("weeks")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("week_id", weekData.id)
+          .maybeSingle();
+
+        if (checkError) {
+          console.error(
+            "Erreur lors de la vérification de l'existence de la semaine:",
+            checkError
           );
+          throw checkError;
+        }
 
-          // Vérifier si la semaine existe déjà
-          const { data: existingWeek, error: checkError } = await supabase
+        const timestamp = new Date().toISOString();
+
+        if (existingWeek) {
+          // console.log(
+          //   `La semaine ${weekData.id} existe déjà, mise à jour...`
+          // );
+          // Mettre à jour la semaine existante
+          const { error: updateError } = await supabase
             .from("weeks")
-            .select("id")
-            .eq("user_id", user.id)
-            .eq("week_id", weekData.id)
-            .maybeSingle();
-
-          if (checkError) {
-            console.error(
-              "Erreur lors de la vérification de l'existence de la semaine:",
-              checkError
-            );
-            throw checkError;
-          }
-
-          const timestamp = new Date().toISOString();
-
-          if (existingWeek) {
-            console.log(
-              `La semaine ${weekData.id} existe déjà, mise à jour...`
-            );
-            // Mettre à jour la semaine existante
-            const { error: updateError } = await supabase
-              .from("weeks")
-              .update({
-                data: weekData,
-                updated_at: timestamp,
-              })
-              .eq("user_id", user.id)
-              .eq("week_id", weekData.id);
-
-            if (updateError) {
-              console.error(
-                "Erreur lors de la mise à jour de la semaine:",
-                updateError
-              );
-              throw updateError;
-            }
-
-            console.log(`Semaine ${weekData.id} mise à jour avec succès`);
-          } else {
-            console.log(
-              `La semaine ${weekData.id} n'existe pas encore, création...`
-            );
-            // Créer une nouvelle semaine
-            const { error: insertError } = await supabase.from("weeks").insert({
-              user_id: user.id,
-              week_id: weekData.id,
+            .update({
               data: weekData,
-              created_at: timestamp,
               updated_at: timestamp,
-            });
+            })
+            .eq("user_id", user.id)
+            .eq("week_id", weekData.id);
 
-            if (insertError) {
-              console.error(
-                "Erreur lors de la création de la semaine:",
-                insertError
-              );
-              throw insertError;
-            }
-
-            console.log(`Semaine ${weekData.id} créée avec succès`);
+          if (updateError) {
+            console.error(
+              "Erreur lors de la mise à jour de la semaine:",
+              updateError
+            );
+            throw updateError;
           }
-        } catch (error) {
-          console.error("Error updating week in Supabase:", error);
-          throw error;
+
+          // console.log(`Semaine ${weekData.id} mise à jour avec succès`);
+        } else {
+          // console.log(
+          //   `La semaine ${weekData.id} n'existe pas encore, création...`
+          // );
+          // Créer une nouvelle semaine
+          const { error: insertError } = await supabase.from("weeks").insert({
+            user_id: user.id,
+            week_id: weekData.id,
+            data: weekData,
+            created_at: timestamp,
+            updated_at: timestamp,
+          });
+
+          if (insertError) {
+            console.error(
+              "Erreur lors de la création de la semaine:",
+              insertError
+            );
+            throw insertError;
+          }
+
+          // console.log(`Semaine ${weekData.id} créée avec succès`);
         }
       },
     }),
