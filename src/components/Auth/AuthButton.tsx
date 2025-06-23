@@ -1,6 +1,6 @@
 import useAuthStore from "@/store/authStore";
-import { CloudIcon, LogInIcon, LogOutIcon, UserPlusIcon } from "lucide-react";
-import React, { useState } from "react";
+import { CloudIcon, EyeIcon, EyeOffIcon, LogInIcon, LogOutIcon, UserPlusIcon } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -16,6 +16,22 @@ const AuthButton: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Réinitialiser les champs lorsque la modal est fermée
+  useEffect(() => {
+    if (!isOpen) {
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setError(null);
+      setSuccess(null);
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setAuthAction("login");
+    }
+  }, [isOpen]);
 
   // Si le store n'est pas encore initialisé, ne rien afficher
   if (!isInitialized) return null;
@@ -124,6 +140,8 @@ const AuthButton: React.FC = () => {
                 onClick={() => {
                   setAuthAction("login");
                   setError(null);
+                  setShowPassword(false);
+                  setShowConfirmPassword(false);
                 }}
                 className="flex-1"
               >
@@ -136,6 +154,8 @@ const AuthButton: React.FC = () => {
                 onClick={() => {
                   setAuthAction("signup");
                   setError(null);
+                  setShowPassword(false);
+                  setShowConfirmPassword(false);
                 }}
                 className="flex-1"
               >
@@ -158,14 +178,28 @@ const AuthButton: React.FC = () => {
 
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeIcon className="h-4 w-4" />
+                  ) : (
+                    <EyeOffIcon className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {authAction === "signup" && (
@@ -173,14 +207,28 @@ const AuthButton: React.FC = () => {
                 <Label htmlFor="confirmPassword">
                   Confirmer le mot de passe
                 </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeIcon className="h-4 w-4" />
+                    ) : (
+                      <EyeOffIcon className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
             )}
 
