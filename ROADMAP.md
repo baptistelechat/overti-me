@@ -22,38 +22,38 @@ Elle est pensée pour une utilisation personnelle, simple et sans backend. Les d
 
 ### 1. Initialisation du projet
 
-- [ ] Créer un projet Vite avec le template `react-ts`
-- [ ] Installer Tailwind CSS
-- [ ] Intégrer shadcn/ui pour les composants
-- [ ] Configurer le routing si besoin (pour gestion de semaine future)
+- [x] Créer un projet Vite avec le template `react-ts`
+- [x] Installer Tailwind CSS
+- [x] Intégrer shadcn/ui pour les composants
+- [x] Configurer le routing si besoin (pour gestion de semaine future)
 
 ---
 
 ### 2. Structure de données & persistance
 
-- [ ] Créer les types `WorkDay` et `WeekData`
-- [ ] Créer un hook `useLocalStorage`
-- [ ] Initialiser une structure de semaine complète (Lundi → Dimanche)
-- [ ] Enregistrer automatiquement les données dans `localStorage`
+- [x] Créer les types `WorkDay` et `WeekData`
+- [x] Créer un hook `useLocalStorage`
+- [x] Initialiser une structure de semaine complète (Lundi → Dimanche)
+- [x] Enregistrer automatiquement les données dans `localStorage`
 
 ---
 
 ### 3. Interface principale
 
-- [ ] Afficher les 7 jours de la semaine avec date
-- [ ] Ajouter la saisie horaire (début/fin OU durée)
-- [ ] Calcul automatique de la durée par jour
-- [ ] Affichage du total hebdomadaire
+- [x] Afficher les 7 jours de la semaine avec date
+- [x] Ajouter la saisie horaire (début/fin OU durée)
+- [x] Calcul automatique de la durée par jour
+- [x] Affichage du total hebdomadaire
 
 ---
 
 ### 4. Calcul des heures supplémentaires
 
-- [ ] Ajouter les règles :
+- [x] Ajouter les règles :
   - Jusqu’à 35h : heures normales
   - 35h à 43h : +25%
   - Après 43h : +50%
-- [ ] Affichage des totaux :
+- [x] Affichage des totaux :
   - Heures normales
   - Heures +25%
   - Heures +50%
@@ -62,27 +62,45 @@ Elle est pensée pour une utilisation personnelle, simple et sans backend. Les d
 
 ### 5. Navigation hebdomadaire
 
-- [ ] Générer un ID de semaine (`2025-W25`)
-- [ ] Permettre de consulter les semaines précédentes
-- [ ] Persister les semaines passées dans le localStorage
+- [x] Générer un ID de semaine (`2025-W25`)
+- [x] Permettre de consulter les semaines précédentes
+- [x] Persister les semaines passées dans le localStorage
 
 ---
 
 ### 6. Export de données
 
-- [ ] Ajouter un bouton d’export
-- [ ] Pouvoir sélectionner les colonnes à inclure ou masquer
-- [ ] Exporter en :
-  - [ ] Excel (via `xlsx`)
-  - [ ] CSV
-  - [ ] JSON
+- [x] Ajouter un bouton d’export
+- [x] Pouvoir sélectionner les colonnes à inclure ou masquer
+- [x] Exporter en :
+  - [x] Excel (via `xlsx`)
+  - [x] CSV
+  - [x] JSON
 
 ---
 
-### 7. Finitions & Bonus
+### 7. Authentification & Synchronisation Supabase
+Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareils grâce à Supabase. Le mode par défaut reste en `localStorage`, sans compte requis.
 
-- [ ] UI responsive, claire et mobile-friendly
+- [ ] Installer et configurer Supabase dans le projet
+- [ ] Ajouter un bouton "Se connecter pour synchroniser"
+- [ ] Intégrer l’authentification Supabase (email/password ou magic link)
+- [ ] Gérer l’état de l’utilisateur (`user`) via Zustand ou contexte
+- [ ] Créer une table `weeks` sur Supabase
+- [ ] Au login :
+  - Charger les semaines depuis Supabase
+  - Fusionner avec celles du `localStorage`
+- [ ] Au logout :
+  - Revenir en mode local uniquement
+- [ ] Ajouter un indicateur de statut (synchronisé / non synchronisé)
+- [ ] Mettre à jour Supabase à chaque modification de semaine (optimiste)
+
+---
+
+### 8. Finitions & Bonus
+
+- [x] UI responsive, claire et mobile-friendly
 - [ ] Ajout d’un thème clair/sombre
-- [ ] Bouton de réinitialisation de la semaine
+- [x] Bouton de réinitialisation de la semaine
 - [ ] Confirmation lors de la suppression d'une semaine
 - [ ] Ajout d'un aperçu avant export
