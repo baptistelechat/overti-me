@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import useAuthStore from "../store/authStore";
 import useWeekStore from "../store/weekStore";
 import AuthButton from "./Auth/AuthButton";
+import SyncStatus from "./Auth/SyncStatus";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import WeekExport from "./WeekExport/index";
@@ -46,6 +47,7 @@ const WeekView: React.FC = () => {
       <div className="flex flex-col items-center mb-6">
         <h1 className="text-3xl font-bold text-center mb-2">⌚ Overti.me</h1>
         <AuthButton />
+        <SyncStatus className="mt-2" />
       </div>
 
       {/* Navigation entre les semaines */}

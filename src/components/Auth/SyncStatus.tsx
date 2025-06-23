@@ -1,6 +1,6 @@
-import React from "react";
 import useAuthStore from "@/store/authStore";
 import { RefreshCwIcon } from "lucide-react";
+import React from "react";
 import { Button } from "../ui/button";
 
 interface SyncStatusProps {
@@ -15,7 +15,7 @@ const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
 
   const formatLastSyncedAt = () => {
     if (!lastSyncedAt) return "Jamais";
-    
+
     const date = new Date(lastSyncedAt);
     return new Intl.DateTimeFormat("fr-FR", {
       day: "2-digit",
@@ -23,6 +23,7 @@ const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      second: "2-digit",
     }).format(date);
   };
 
@@ -57,22 +58,24 @@ const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
   };
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 flex-wrap ${className}`}>
       <span className={`text-sm font-medium ${getSyncStatusColor()}`}>
         {getSyncStatusText()}
       </span>
       <span className="text-xs text-muted-foreground">
         Dernière synchronisation : {formatLastSyncedAt()}
       </span>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => syncWeeks()}
-        disabled={syncStatus === "syncing"}
-      >
-        <RefreshCwIcon className="h-4 w-4 mr-2" />
-        Synchroniser
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => syncWeeks()}
+          disabled={syncStatus === "syncing"}
+        >
+          <RefreshCwIcon className="h-4 w-4 mr-2" />
+          Synchroniser
+        </Button>
+      </div>
     </div>
   );
 };

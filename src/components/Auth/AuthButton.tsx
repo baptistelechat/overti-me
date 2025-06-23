@@ -1,11 +1,5 @@
 import useAuthStore from "@/store/authStore";
-import {
-  CloudIcon,
-  LogInIcon,
-  LogOutIcon,
-  RefreshCwIcon,
-  UserPlusIcon,
-} from "lucide-react";
+import { CloudIcon, LogInIcon, LogOutIcon, UserPlusIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -13,16 +7,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 const AuthButton: React.FC = () => {
-  const {
-    user,
-    isInitialized,
-    syncStatus,
-    lastSyncedAt,
-    login,
-    logout,
-    syncWeeks,
-    signup,
-  } = useAuthStore();
+  const { user, isInitialized, login, logout, signup } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -97,93 +82,20 @@ const AuthButton: React.FC = () => {
     }
   };
 
-  const handleSync = async () => {
-    setIsLoading(true);
-    try {
-      await syncWeeks();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const formatLastSyncedAt = () => {
-    if (!lastSyncedAt) return "Jamais";
-
-    const date = new Date(lastSyncedAt);
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
-  const getSyncStatusText = () => {
-    switch (syncStatus) {
-      case "synced":
-        return "Synchronisé";
-      case "not_synced":
-        return "Non synchronisé";
-      case "syncing":
-        return "Synchronisation en cours...";
-      case "error":
-        return "Erreur de synchronisation";
-      default:
-        return "État inconnu";
-    }
-  };
-
-  const getSyncStatusColor = () => {
-    switch (syncStatus) {
-      case "synced":
-        return "text-green-500";
-      case "not_synced":
-        return "text-yellow-500";
-      case "syncing":
-        return "text-blue-500";
-      case "error":
-        return "text-red-500";
-      default:
-        return "text-gray-500";
-    }
-  };
-
   return (
     <>
       {user ? (
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Connecté en tant que {user.email}</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              disabled={isLoading}
-            >
-              <LogOutIcon className="h-4 w-4 mr-2" />
-              Déconnexion
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`text-sm ${getSyncStatusColor()}`}>
-              {getSyncStatusText()}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Dernière synchronisation : {formatLastSyncedAt()}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSync}
-              disabled={isLoading || syncStatus === "syncing"}
-            >
-              <RefreshCwIcon className="h-4 w-4 mr-2" />
-              Synchroniser
-            </Button>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">Connecté en tant que {user.email}</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleLogout}
+            disabled={isLoading}
+          >
+            <LogOutIcon className="h-4 w-4 mr-2" />
+            Déconnexion
+          </Button>
         </div>
       ) : (
         <Button
@@ -191,8 +103,8 @@ const AuthButton: React.FC = () => {
           onClick={() => setIsOpen(true)}
           className="flex items-center gap-2"
         >
-          <CloudIcon className="h-4 w-4" />
-          Se connecter pour synchroniser
+          <CloudIcon className="h-4 w-4 mr-2" />
+          Se connecter
         </Button>
       )}
 
@@ -258,7 +170,9 @@ const AuthButton: React.FC = () => {
 
             {authAction === "signup" && (
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirmPassword">
+                  Confirmer le mot de passe
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"

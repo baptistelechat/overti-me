@@ -33,12 +33,12 @@ const useWeekStore = create<WeekStore>()(
       weeks: {},
 
       // Initialiser une semaine (courante par défaut ou spécifiée)
-      initializeWeek: (weekId) => {
+      initializeWeek: (weekId, forceReset = false) => {
         const targetWeekId = weekId || getWeekId(new Date());
         const existingWeek = get().weeks[targetWeekId];
 
-        if (!existingWeek) {
-          // Créer une nouvelle semaine si elle n'existe pas
+        if (!existingWeek || forceReset) {
+          // Créer une nouvelle semaine si elle n'existe pas ou si on force la réinitialisation
           const weekDates = getWeekDates(targetWeekId);
 
           const newWeek: WeekData = {
@@ -62,11 +62,20 @@ const useWeekStore = create<WeekStore>()(
           }));
           
           // Synchroniser la nouvelle semaine avec Supabase si l'utilisateur est connecté
-          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          const { user, updateWeekInSupabase, syncWeeks } = useAuthStore.getState();
           if (user) {
-            updateWeekInSupabase(newWeek).catch(error => {
-              console.error("Erreur lors de la synchronisation de la nouvelle semaine avec Supabase:", error);
-            });
+            updateWeekInSupabase(newWeek)
+              .then(() => {
+                // Déclencher une synchronisation complète après un court délai
+                setTimeout(() => {
+                  if (useAuthStore.getState().user) {
+                    syncWeeks();
+                  }
+                }, 2000);
+              })
+              .catch(error => {
+                console.error("Erreur lors de la synchronisation de la nouvelle semaine avec Supabase:", error);
+              });
           }
         } else {
           // Si la semaine existe déjà, définir simplement comme semaine courante
@@ -205,13 +214,21 @@ const useWeekStore = create<WeekStore>()(
           calculateTotals();
           
           // Synchroniser avec Supabase si l'utilisateur est connecté
-          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          const { user, updateWeekInSupabase, syncWeeks } = useAuthStore.getState();
           if (user) {
             // On récupère la semaine mise à jour après le calcul des totaux
             const updatedWeek = get().weeks[currentWeekId];
             updateWeekInSupabase(updatedWeek).catch(error => {
               console.error("Erreur lors de la synchronisation avec Supabase:", error);
             });
+            
+            // Déclencher une synchronisation complète après un court délai
+            // pour s'assurer que les données sont à jour dans les deux sens
+            setTimeout(() => {
+              if (useAuthStore.getState().user) {
+                syncWeeks();
+              }
+            }, 2000);
           }
         }
       },
@@ -280,7 +297,15 @@ const useWeekStore = create<WeekStore>()(
         // Réinitialiser avec une nouvelle semaine vide
         get().initializeWeek(currentWeekId);
         
-        // La synchronisation avec Supabase est gérée dans initializeWeek
+        // Synchroniser avec Supabase après réinitialisation
+        const { user, syncWeeks } = useAuthStore.getState();
+        if (user) {
+          setTimeout(() => {
+            if (useAuthStore.getState().user) {
+              syncWeeks();
+            }
+          }, 2000);
+        }
       },
 
       // Réinitialiser un jour spécifique
@@ -325,13 +350,20 @@ const useWeekStore = create<WeekStore>()(
           calculateTotals();
           
           // Synchroniser avec Supabase si l'utilisateur est connecté
-          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          const { user, updateWeekInSupabase, syncWeeks } = useAuthStore.getState();
           if (user) {
             // On récupère la semaine mise à jour après le calcul des totaux
             const updatedWeek = get().weeks[currentWeekId];
             updateWeekInSupabase(updatedWeek).catch(error => {
               console.error("Erreur lors de la synchronisation avec Supabase:", error);
             });
+            
+            // Déclencher une synchronisation complète après un court délai
+            setTimeout(() => {
+              if (useAuthStore.getState().user) {
+                syncWeeks();
+              }
+            }, 2000);
           }
         }
       },

@@ -18,6 +18,7 @@ interface AuthState {
   lastSyncedAt: string | null;
   syncStatus: "synced" | "not_synced" | "syncing" | "error";
   syncError: string | null;
+  autoSyncInterval: number | null;
 
   // Actions
   initialize: () => Promise<void>;
@@ -29,6 +30,8 @@ interface AuthState {
   logout: () => Promise<void>;
   syncWeeks: () => Promise<void>;
   updateWeekInSupabase: (weekData: WeekData) => Promise<void>;
+  setupAutoSync: () => void;
+  stopAutoSync: () => void;
 }
 
 // Créer le client Supabase
@@ -44,8 +47,8 @@ const createSupabaseClient = () => {
   return createClient(supabaseUrl, supabaseKey);
 };
 
-// Création du store Zustand avec persistance localStorage
-const useAuthStore = create<AuthState>()(
+// Créer le store d'authentification avec Zustand
+const useAuthStore = create<AuthState>()(  
   persist(
     (set, get) => ({
       // État initial
@@ -56,6 +59,7 @@ const useAuthStore = create<AuthState>()(
       lastSyncedAt: null,
       syncStatus: "not_synced",
       syncError: null,
+      autoSyncInterval: null,
 
       // Initialiser le client Supabase et vérifier la session
       initialize: async () => {
@@ -83,6 +87,9 @@ const useAuthStore = create<AuthState>()(
           );
           // Synchroniser les données immédiatement
           await get().syncWeeks();
+          
+          // Configurer la synchronisation automatique
+          get().setupAutoSync();
         } else {
           set({ isInitialized: true });
         }
@@ -101,6 +108,9 @@ const useAuthStore = create<AuthState>()(
             setTimeout(async () => {
               console.log("Démarrage de la synchronisation après connexion...");
               await get().syncWeeks();
+              
+              // Configurer la synchronisation automatique
+              get().setupAutoSync();
             }, 500);
           } else if (event === "SIGNED_OUT") {
             console.log("Utilisateur déconnecté");
@@ -110,6 +120,9 @@ const useAuthStore = create<AuthState>()(
               syncStatus: "not_synced",
               syncError: null,
             });
+            
+            // Arrêter la synchronisation automatique
+            get().stopAutoSync();
           }
         });
       },
@@ -178,8 +191,11 @@ const useAuthStore = create<AuthState>()(
 
       // Déconnexion
       logout: async () => {
-        const { supabase } = get();
+        const supabase = get().supabase;
         if (!supabase) return;
+
+        // Arrêter la synchronisation automatique avant la déconnexion
+        get().stopAutoSync();
 
         await supabase.auth.signOut();
         set({
@@ -188,6 +204,38 @@ const useAuthStore = create<AuthState>()(
           syncStatus: "not_synced",
           syncError: null,
         });
+      },
+
+      // Configurer la synchronisation automatique
+      setupAutoSync: () => {
+        // Arrêter toute synchronisation automatique existante
+        get().stopAutoSync();
+        
+        // Vérifier si l'utilisateur est connecté
+        if (!get().user) return;
+        
+        // Configurer un intervalle pour synchroniser toutes les 5 minutes (300000 ms)
+        const intervalId = window.setInterval(async () => {
+          console.log("Synchronisation automatique déclenchée");
+          // Ne synchroniser que si l'utilisateur est toujours connecté et qu'on n'est pas déjà en train de synchroniser
+          if (get().user && !get().isSyncing) {
+            await get().syncWeeks();
+          }
+        }, 300000); // 5 minutes
+        
+        // Stocker l'ID de l'intervalle
+        set({ autoSyncInterval: intervalId });
+        console.log("Synchronisation automatique configurée");
+      },
+      
+      // Arrêter la synchronisation automatique
+      stopAutoSync: () => {
+        const intervalId = get().autoSyncInterval;
+        if (intervalId !== null) {
+          window.clearInterval(intervalId);
+          set({ autoSyncInterval: null });
+          console.log("Synchronisation automatique arrêtée");
+        }
       },
 
       // Synchroniser les semaines entre localStorage et Supabase
