@@ -82,18 +82,18 @@ Elle est pensée pour une utilisation personnelle, simple et sans backend. Les d
 ### 7. Authentification & Synchronisation Supabase
 Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareils grâce à Supabase. Le mode par défaut reste en `localStorage`, sans compte requis.
 
-- [ ] Installer et configurer Supabase dans le projet
-- [ ] Ajouter un bouton "Se connecter pour synchroniser"
-- [ ] Intégrer l’authentification Supabase (email/password ou magic link)
-- [ ] Gérer l’état de l’utilisateur (`user`) via Zustand ou contexte
-- [ ] Créer une table `weeks` sur Supabase
-- [ ] Au login :
+- [x] Installer et configurer Supabase dans le projet
+- [x] Ajouter un bouton "Se connecter pour synchroniser"
+- [x] Intégrer l'authentification Supabase (email/password ou magic link)
+- [x] Gérer l'état de l'utilisateur (`user`) via Zustand ou contexte
+- [x] Créer une table `weeks` sur Supabase
+- [x] Au login :
   - Charger les semaines depuis Supabase
   - Fusionner avec celles du `localStorage`
-- [ ] Au logout :
+- [x] Au logout :
   - Revenir en mode local uniquement
-- [ ] Ajouter un indicateur de statut (synchronisé / non synchronisé)
-- [ ] Mettre à jour Supabase à chaque modification de semaine (optimiste)
+- [x] Ajouter un indicateur de statut (synchronisé / non synchronisé)
+- [x] Mettre à jour Supabase à chaque modification de semaine (optimiste)
 
 ---
 

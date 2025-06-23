@@ -7,6 +7,7 @@ import { getWeekId } from "@/utils/date/weekId";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { WeekData, WorkDay } from "../types";
+import useAuthStore from "./authStore";
 
 interface WeekStore {
   // État
@@ -59,6 +60,14 @@ const useWeekStore = create<WeekStore>()(
             weeks: { ...state.weeks, [targetWeekId]: newWeek },
             currentWeekId: targetWeekId,
           }));
+          
+          // Synchroniser la nouvelle semaine avec Supabase si l'utilisateur est connecté
+          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          if (user) {
+            updateWeekInSupabase(newWeek).catch(error => {
+              console.error("Erreur lors de la synchronisation de la nouvelle semaine avec Supabase:", error);
+            });
+          }
         } else {
           // Si la semaine existe déjà, définir simplement comme semaine courante
           set({ currentWeekId: targetWeekId });
@@ -194,6 +203,16 @@ const useWeekStore = create<WeekStore>()(
 
           // Recalculer les totaux
           calculateTotals();
+          
+          // Synchroniser avec Supabase si l'utilisateur est connecté
+          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          if (user) {
+            // On récupère la semaine mise à jour après le calcul des totaux
+            const updatedWeek = get().weeks[currentWeekId];
+            updateWeekInSupabase(updatedWeek).catch(error => {
+              console.error("Erreur lors de la synchronisation avec Supabase:", error);
+            });
+          }
         }
       },
 
@@ -235,6 +254,16 @@ const useWeekStore = create<WeekStore>()(
               },
             },
           }));
+          
+          // Synchroniser avec Supabase si l'utilisateur est connecté
+          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          if (user) {
+            // On récupère la semaine mise à jour
+            const updatedWeek = get().weeks[currentWeekId];
+            updateWeekInSupabase(updatedWeek).catch(error => {
+              console.error("Erreur lors de la synchronisation avec Supabase:", error);
+            });
+          }
         }
       },
 
@@ -250,6 +279,8 @@ const useWeekStore = create<WeekStore>()(
 
         // Réinitialiser avec une nouvelle semaine vide
         get().initializeWeek(currentWeekId);
+        
+        // La synchronisation avec Supabase est gérée dans initializeWeek
       },
 
       // Réinitialiser un jour spécifique
@@ -292,6 +323,16 @@ const useWeekStore = create<WeekStore>()(
 
           // Recalculer les totaux
           calculateTotals();
+          
+          // Synchroniser avec Supabase si l'utilisateur est connecté
+          const { user, updateWeekInSupabase } = useAuthStore.getState();
+          if (user) {
+            // On récupère la semaine mise à jour après le calcul des totaux
+            const updatedWeek = get().weeks[currentWeekId];
+            updateWeekInSupabase(updatedWeek).catch(error => {
+              console.error("Erreur lors de la synchronisation avec Supabase:", error);
+            });
+          }
         }
       },
 

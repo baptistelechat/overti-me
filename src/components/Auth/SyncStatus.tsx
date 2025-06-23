@@ -1,0 +1,80 @@
+import React from "react";
+import useAuthStore from "@/store/authStore";
+import { RefreshCwIcon } from "lucide-react";
+import { Button } from "../ui/button";
+
+interface SyncStatusProps {
+  className?: string;
+}
+
+const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
+  const { user, syncStatus, lastSyncedAt, syncWeeks } = useAuthStore();
+
+  // Si l'utilisateur n'est pas connecté, ne rien afficher
+  if (!user) return null;
+
+  const formatLastSyncedAt = () => {
+    if (!lastSyncedAt) return "Jamais";
+    
+    const date = new Date(lastSyncedAt);
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  const getSyncStatusText = () => {
+    switch (syncStatus) {
+      case "synced":
+        return "Synchronisé";
+      case "not_synced":
+        return "Non synchronisé";
+      case "syncing":
+        return "Synchronisation en cours...";
+      case "error":
+        return "Erreur de synchronisation";
+      default:
+        return "État inconnu";
+    }
+  };
+
+  const getSyncStatusColor = () => {
+    switch (syncStatus) {
+      case "synced":
+        return "text-green-500";
+      case "not_synced":
+        return "text-yellow-500";
+      case "syncing":
+        return "text-blue-500";
+      case "error":
+        return "text-red-500";
+      default:
+        return "text-gray-500";
+    }
+  };
+
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      <span className={`text-sm font-medium ${getSyncStatusColor()}`}>
+        {getSyncStatusText()}
+      </span>
+      <span className="text-xs text-muted-foreground">
+        Dernière synchronisation : {formatLastSyncedAt()}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => syncWeeks()}
+        disabled={syncStatus === "syncing"}
+      >
+        <RefreshCwIcon className="h-4 w-4 mr-2" />
+        Synchroniser
+      </Button>
+    </div>
+  );
+};
+
+export default SyncStatus;

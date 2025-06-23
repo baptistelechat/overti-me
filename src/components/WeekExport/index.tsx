@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import React from "react";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import useWeekStore from "../../store/weekStore";
@@ -40,6 +41,7 @@ const WeekExport: React.FC = () => {
     <Dialog>
       <DialogTrigger asChild>
         <Button className="bg-green-500 hover:bg-green-600">
+          <Download className="size-4 mr-1" />
           Exporter les données
         </Button>
       </DialogTrigger>
