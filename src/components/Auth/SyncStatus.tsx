@@ -65,8 +65,9 @@ const SyncStatus: React.FC<SyncStatusProps> = ({ className = "" }) => {
           size="sm"
           onClick={() => syncWeeks()}
           disabled={syncStatus === "syncing"}
+          className="flex items-center gap-2"
         >
-          <RefreshCwIcon className="h-4 w-4 mr-2" />
+          <RefreshCwIcon className="size-4" />
           Synchroniser
         </Button>
       </div>

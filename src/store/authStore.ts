@@ -30,6 +30,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   resetPasswordForEmail: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
+  updateEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   checkPasswordRecoveryMode: () => Promise<boolean>;
   logout: () => Promise<void>;
   syncWeeks: () => Promise<void>;
@@ -220,19 +221,72 @@ const useAuthStore = create<AuthState>()(
         const { supabase } = get();
         if (!supabase) return { error: "Supabase client not initialized" };
 
-        const { error } = await supabase.auth.updateUser({
-          password,
-        });
+        try {
+          const { error } = await supabase.auth.updateUser({
+            password,
+          });
 
-        if (error) {
-          console.error("Erreur lors de la mise à jour du mot de passe:", error.message);
-          return { error: error.message };
+          if (error) {
+            console.error("Erreur lors de la mise à jour du mot de passe:", error.message);
+            return { error: error.message };
+          }
+
+          // Réinitialiser le mode de récupération de mot de passe
+          set({ isPasswordRecoveryMode: false });
+
+          return { error: null };
+        } catch (error) {
+          console.error("Error updating password:", error);
+          return { error: "Une erreur est survenue lors de la mise à jour du mot de passe" };
         }
+      },
 
-        // Réinitialiser le mode de récupération de mot de passe
-        set({ isPasswordRecoveryMode: false });
+      // Mettre à jour l'email
+      updateEmail: async (email, password) => {
+        const { supabase } = get();
+        if (!supabase) return { error: "Supabase client not initialized" };
 
-        return { error: null };
+        try {
+          // Vérifier d'abord le mot de passe en essayant de se connecter avec l'email actuel et le mot de passe fourni
+          const user = get().user;
+          if (!user || !user.email) {
+            return { error: "Utilisateur non connecté ou email manquant" };
+          }
+
+          // Vérifier si l'email est différent de l'email actuel
+          if (email === user.email) {
+            return { error: "La nouvelle adresse email est identique à l'adresse actuelle" };
+          }
+
+          // Vérifier le mot de passe actuel
+          if (!password) {
+            return { error: "Veuillez fournir votre mot de passe actuel pour confirmer le changement d'email" };
+          }
+
+          // Vérifier le mot de passe en essayant de se connecter avec l'email actuel
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: user.email,
+            password,
+          });
+
+          if (signInError) {
+            return { error: "Mot de passe incorrect" };
+          }
+
+          // Mettre à jour l'email
+          const { error } = await supabase.auth.updateUser({
+            email,
+          });
+
+          if (error) {
+            return { error: error.message };
+          }
+
+          return { error: null };
+        } catch (error) {
+          console.error("Error updating email:", error);
+          return { error: "Une erreur est survenue lors de la mise à jour de l'adresse email" };
+        }
       },
 
       // Vérifier si l'utilisateur est en mode récupération de mot de passe

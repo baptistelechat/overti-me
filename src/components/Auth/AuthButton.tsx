@@ -18,21 +18,23 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 const AuthButton: React.FC = () => {
-  const { 
-    user, 
-    isInitialized, 
-    login, 
-    logout, 
-    signup, 
-    resetPasswordForEmail, 
-    updatePassword, 
-    isPasswordRecoveryMode, 
-    checkPasswordRecoveryMode 
+  const {
+    user,
+    isInitialized,
+    login,
+    logout,
+    signup,
+    resetPasswordForEmail,
+    updatePassword,
+    isPasswordRecoveryMode,
+    checkPasswordRecoveryMode,
   } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [authAction, setAuthAction] = useState<"login" | "signup" | "forgot">("login");
+  const [authAction, setAuthAction] = useState<"login" | "signup" | "forgot">(
+    "login"
+  );
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +61,7 @@ const AuthButton: React.FC = () => {
     const checkRecoveryMode = async () => {
       await checkPasswordRecoveryMode();
     };
-    
+
     checkRecoveryMode();
   }, [checkPasswordRecoveryMode]);
 
@@ -69,12 +71,12 @@ const AuthButton: React.FC = () => {
       setIsOpen(true);
       setAuthAction("forgot");
       setSuccess("Veuillez définir votre nouveau mot de passe.");
-      
+
       // Récupérer l'email de l'utilisateur depuis l'URL si disponible
       const hash = window.location.hash;
       const params = new URLSearchParams(hash.substring(1));
       const email = params.get("email");
-      
+
       // Si l'email n'est pas directement disponible, essayer de l'extraire du token
       if (email) {
         setEmail(email);
@@ -83,7 +85,7 @@ const AuthButton: React.FC = () => {
         try {
           const accessToken = params.get("access_token");
           if (accessToken) {
-            const tokenParts = accessToken.split('.');
+            const tokenParts = accessToken.split(".");
             if (tokenParts.length === 3) {
               const payload = JSON.parse(atob(tokenParts[1]));
               if (payload.email) {
@@ -92,7 +94,10 @@ const AuthButton: React.FC = () => {
             }
           }
         } catch (error) {
-          console.error("Erreur lors de l'extraction de l'email du token:", error);
+          console.error(
+            "Erreur lors de l'extraction de l'email du token:",
+            error
+          );
         }
       }
     }
@@ -160,7 +165,9 @@ const AuthButton: React.FC = () => {
         if (error) {
           setError(error);
         } else {
-          setSuccess("Mot de passe mis à jour avec succès. Vous pouvez maintenant vous connecter.");
+          setSuccess(
+            "Mot de passe mis à jour avec succès. Vous pouvez maintenant vous connecter."
+          );
           setAuthAction("login");
         }
       }
@@ -203,8 +210,9 @@ const AuthButton: React.FC = () => {
             size="sm"
             onClick={handleLogout}
             disabled={isLoading}
+            className="flex items-center gap-2"
           >
-            <LogOutIcon className="h-4 w-4 mr-2" />
+            <LogOutIcon className="size-4" />
             Déconnexion
           </Button>
         </div>
@@ -214,7 +222,7 @@ const AuthButton: React.FC = () => {
           onClick={() => setIsOpen(true)}
           className="flex items-center gap-2"
         >
-          <CloudIcon className="h-4 w-4 mr-2" />
+          <CloudIcon className="size-4" />
           Se connecter pour synchroniser
         </Button>
       )}
@@ -223,12 +231,12 @@ const AuthButton: React.FC = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {authAction === "login" 
-                ? "Connexion" 
-                : authAction === "signup" 
-                ? "Inscription" 
-                : isPasswordRecoveryMode 
-                ? "Réinitialisation du mot de passe" 
+              {authAction === "login"
+                ? "Connexion"
+                : authAction === "signup"
+                ? "Inscription"
+                : isPasswordRecoveryMode
+                ? "Réinitialisation du mot de passe"
                 : "Mot de passe oublié"}
             </DialogTitle>
           </DialogHeader>
@@ -245,9 +253,9 @@ const AuthButton: React.FC = () => {
                     setShowPassword(false);
                     setShowConfirmPassword(false);
                   }}
-                  className="flex-1"
+                  className="flex items-center gap-2"
                 >
-                  <LogInIcon className="h-4 w-4 mr-2" />
+                  <LogInIcon className="size-4" />
                   Connexion
                 </Button>
                 <Button
@@ -259,9 +267,9 @@ const AuthButton: React.FC = () => {
                     setShowPassword(false);
                     setShowConfirmPassword(false);
                   }}
-                  className="flex-1"
+                  className="flex items-center gap-2"
                 >
-                  <UserPlusIcon className="h-4 w-4 mr-2" />
+                  <UserPlusIcon className="size-4" />
                   Inscription
                 </Button>
               </div>
@@ -300,16 +308,17 @@ const AuthButton: React.FC = () => {
                     tabIndex={-1}
                   >
                     {showPassword ? (
-                      <EyeIcon className="h-4 w-4" />
+                      <EyeIcon className="size-4" />
                     ) : (
-                      <EyeOffIcon className="h-4 w-4" />
+                      <EyeOffIcon className="size-4" />
                     )}
                   </button>
                 </div>
               </div>
             )}
 
-            {(authAction === "signup" || authAction === "forgot" && isPasswordRecoveryMode) && (
+            {(authAction === "signup" ||
+              (authAction === "forgot" && isPasswordRecoveryMode)) && (
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">
                   Confirmer le mot de passe
@@ -330,9 +339,9 @@ const AuthButton: React.FC = () => {
                     tabIndex={-1}
                   >
                     {showConfirmPassword ? (
-                      <EyeIcon className="h-4 w-4" />
+                      <EyeIcon className="size-4" />
                     ) : (
-                      <EyeOffIcon className="h-4 w-4" />
+                      <EyeOffIcon className="size-4" />
                     )}
                   </button>
                 </div>
