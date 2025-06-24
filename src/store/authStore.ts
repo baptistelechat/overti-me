@@ -19,6 +19,7 @@ interface AuthState {
   syncStatus: "synced" | "not_synced" | "syncing" | "error";
   syncError: string | null;
   autoSyncInterval: number | null;
+  isPasswordRecoveryMode: boolean;
 
   // Actions
   initialize: () => Promise<void>;
@@ -27,6 +28,9 @@ interface AuthState {
     password: string
   ) => Promise<{ error: string | null }>;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
+  resetPasswordForEmail: (email: string) => Promise<{ error: string | null }>;
+  updatePassword: (password: string) => Promise<{ error: string | null }>;
+  checkPasswordRecoveryMode: () => Promise<boolean>;
   logout: () => Promise<void>;
   syncWeeks: () => Promise<void>;
   updateWeekInSupabase: (weekData: WeekData) => Promise<void>;
@@ -52,6 +56,7 @@ const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       // État initial
+      // État initial
       user: null,
       supabase: null,
       isInitialized: false,
@@ -60,6 +65,7 @@ const useAuthStore = create<AuthState>()(
       syncStatus: "not_synced",
       syncError: null,
       autoSyncInterval: null,
+      isPasswordRecoveryMode: false,
 
       // Initialiser le client Supabase et vérifier la session
       initialize: async () => {
@@ -72,6 +78,9 @@ const useAuthStore = create<AuthState>()(
         }
 
         set({ supabase });
+
+        // Vérifier si l'utilisateur est en mode récupération de mot de passe
+        await get().checkPasswordRecoveryMode();
 
         // Vérifier si l'utilisateur est déjà connecté
         const { data } = await supabase.auth.getSession();
@@ -187,6 +196,60 @@ const useAuthStore = create<AuthState>()(
         }, 1000);
 
         return { error: null };
+      },
+
+      // Réinitialisation du mot de passe par email
+      resetPasswordForEmail: async (email) => {
+        const { supabase } = get();
+        if (!supabase) return { error: "Supabase client not initialized" };
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}`,
+        });
+
+        if (error) {
+          console.error("Erreur lors de la réinitialisation du mot de passe:", error.message);
+          return { error: error.message };
+        }
+
+        return { error: null };
+      },
+
+      // Mettre à jour le mot de passe
+      updatePassword: async (password) => {
+        const { supabase } = get();
+        if (!supabase) return { error: "Supabase client not initialized" };
+
+        const { error } = await supabase.auth.updateUser({
+          password,
+        });
+
+        if (error) {
+          console.error("Erreur lors de la mise à jour du mot de passe:", error.message);
+          return { error: error.message };
+        }
+
+        // Réinitialiser le mode de récupération de mot de passe
+        set({ isPasswordRecoveryMode: false });
+
+        return { error: null };
+      },
+
+      // Vérifier si l'utilisateur est en mode récupération de mot de passe
+      checkPasswordRecoveryMode: async () => {
+        const { supabase } = get();
+        if (!supabase) return false;
+
+        // Vérifier si l'URL contient un token de récupération
+        const hash = window.location.hash;
+        const type = new URLSearchParams(hash.substring(1)).get("type");
+        
+        const isRecoveryMode = type === "recovery";
+        
+        // Mettre à jour l'état
+        set({ isPasswordRecoveryMode: isRecoveryMode });
+        
+        return isRecoveryMode;
       },
 
       // Déconnexion
