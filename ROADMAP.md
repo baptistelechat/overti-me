@@ -1,6 +1,6 @@
 # 🛠️ Roadmap – OverTime App (Overti.me)
 
-**Overti.me** est une mini-application web qui permet de suivre ses heures de travail quotidiennes, de calculer automatiquement les heures supplémentaires (+25%, +50%), et d’exporter les données au format CSV, Excel ou JSON.
+**Overti.me** est une mini-application web qui permet de suivre ses heures de travail quotidiennes, de calculer automatiquement les heures supplémentaires (+25%, +50%), et d'exporter les données au format CSV, Excel ou JSON.
 
 Elle est pensée pour une utilisation personnelle, simple et sans backend. Les données sont sauvegardées en local (`localStorage`) pour permettre une saisie progressive au fil de la semaine.
 
@@ -50,7 +50,7 @@ Elle est pensée pour une utilisation personnelle, simple et sans backend. Les d
 ### 4. Calcul des heures supplémentaires
 
 - [x] Ajouter les règles :
-  - Jusqu’à 35h : heures normales
+  - Jusqu'à 35h : heures normales
   - 35h à 43h : +25%
   - Après 43h : +50%
 - [x] Affichage des totaux :
@@ -70,7 +70,7 @@ Elle est pensée pour une utilisation personnelle, simple et sans backend. Les d
 
 ### 6. Export de données
 
-- [x] Ajouter un bouton d’export
+- [x] Ajouter un bouton d'export
 - [x] Pouvoir sélectionner les colonnes à inclure ou masquer
 - [x] Exporter en :
   - [x] Excel (via `xlsx`)
@@ -97,10 +97,39 @@ Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareil
 
 ---
 
-### 8. Finitions & Bonus
+### 8. Améliorations de l'authentification
+
+- [x] Gestion de la récupération de mot de passe
+- [x] Extraction de l'email depuis les tokens JWT
+- [ ] Amélioration des messages d'erreur et de succès
+- [ ] Validation des formulaires avec Zod
+- [ ] Possibilité de modifier son email
+- [ ] Possibilité de supprimer son compte
+- [ ] Ajout d'une page de profil utilisateur
+- [ ] Gestion des sessions multiples
+- [ ] Ajout d'une option "Se souvenir de moi"
+
+---
+
+### 9. Sécurité et confidentialité
+
+- [ ] Mise en place de politiques RLS plus strictes
+- [ ] Ajout d'une page de confidentialité
+- [ ] Option pour supprimer toutes les données utilisateur
+- [ ] Chiffrement des données sensibles
+- [ ] Audit de sécurité
+- [ ] Mise en place de limites de taux (rate limiting)
+
+---
+
+### 10. Finitions & Bonus
 
 - [x] UI responsive, claire et mobile-friendly
-- [ ] Ajout d’un thème clair/sombre
+- [ ] Ajout d'un thème clair/sombre
 - [x] Bouton de réinitialisation de la semaine
 - [ ] Confirmation lors de la suppression d'une semaine
 - [ ] Ajout d'un aperçu avant export
+- [ ] Notifications pour les synchronisations réussies/échouées
+- [ ] Mode hors ligne avec synchronisation différée
+- [ ] Statistiques d'utilisation (heures travaillées par mois, etc.)
+- [ ] Personnalisation des seuils d'heures supplémentaires
