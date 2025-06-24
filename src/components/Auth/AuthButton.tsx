@@ -1,6 +1,13 @@
 import useAuthStore from "@/store/authStore";
-import { CloudIcon, EyeIcon, EyeOffIcon, LogInIcon, LogOutIcon, UserPlusIcon } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import {
+  CloudIcon,
+  EyeIcon,
+  EyeOffIcon,
+  LogInIcon,
+  LogOutIcon,
+  UserPlusIcon,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -237,6 +244,7 @@ const AuthButton: React.FC = () => {
 
             <div className="flex justify-end">
               <Button type="submit" disabled={isLoading}>
+                {authAction === "login" ? <LogInIcon /> : <UserPlusIcon />}
                 {isLoading
                   ? "Chargement..."
                   : authAction === "login"
