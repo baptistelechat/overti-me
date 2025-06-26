@@ -88,7 +88,8 @@ const ProfileButton: React.FC = () => {
         setSuccess(
           "Un email de confirmation a été envoyé à votre nouvelle adresse email. " +
             "Veuillez cliquer sur le lien dans cet email pour confirmer le changement. " +
-            "IMPORTANT : Vous devez continuer à utiliser votre ancienne adresse email pour vous connecter jusqu'à ce que vous ayez confirmé le changement."
+            "IMPORTANT : Vous devez continuer à utiliser votre ancienne adresse email pour vous connecter jusqu'à ce que vous ayez confirmé le changement. " +
+            "Après avoir cliqué sur le lien de confirmation, veuillez vous déconnecter et vous reconnecter avec votre nouvelle adresse email."
         );
         // Réinitialiser le mot de passe actuel après succès
         setCurrentPassword("");

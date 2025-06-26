@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import useAuthStore from "../store/authStore";
 import useWeekStore from "../store/weekStore";
 import AuthButton from "./Auth/AuthButton";
+import EmailChangeConfirmationHandler from "./Auth/EmailChangeConfirmationHandler";
 import ProfileButton from "./Auth/ProfileButton";
 import SyncStatus from "./Auth/SyncStatus";
 import { Button } from "./ui/button";
@@ -45,6 +46,11 @@ const WeekView: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Gestionnaire de confirmation de changement d'email */}
+      <div className="mb-4">
+        <EmailChangeConfirmationHandler />
+      </div>
+      
       <div className="flex flex-col items-center mb-6">
         <h1 className="text-3xl font-bold text-center mb-2">⌚ Overti.me</h1>
         <div className="flex items-center gap-2">

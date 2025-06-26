@@ -30,7 +30,11 @@ interface AuthState {
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   resetPasswordForEmail: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
-  updateEmail: (email: string, password: string) => Promise<{ error: string | null }>;
+  updateEmail: (
+    email: string,
+    password: string
+  ) => Promise<{ error: string | null }>;
+  handleEmailChangeConfirmation: () => Promise<{ error: string | null }>;
   checkPasswordRecoveryMode: () => Promise<boolean>;
   logout: () => Promise<void>;
   syncWeeks: () => Promise<void>;
@@ -106,7 +110,7 @@ const useAuthStore = create<AuthState>()(
 
         // Configurer les listeners pour les changements d'authentification
         supabase.auth.onAuthStateChange(async (event, session) => {
-          // console.log("Changement d'état d'authentification:", event);
+          console.log("Changement d'état d'authentification:", event);
 
           if (event === "SIGNED_IN" && session?.user) {
             // console.log(
@@ -133,6 +137,10 @@ const useAuthStore = create<AuthState>()(
 
             // Arrêter la synchronisation automatique
             get().stopAutoSync();
+          } else if (event === "USER_UPDATED" && session?.user) {
+            console.log("Utilisateur mis à jour:", session.user);
+            // Mettre à jour les informations de l'utilisateur dans le state
+            set({ user: session.user });
           }
         });
       },
@@ -209,7 +217,10 @@ const useAuthStore = create<AuthState>()(
         });
 
         if (error) {
-          console.error("Erreur lors de la réinitialisation du mot de passe:", error.message);
+          console.error(
+            "Erreur lors de la réinitialisation du mot de passe:",
+            error.message
+          );
           return { error: error.message };
         }
 
@@ -227,7 +238,10 @@ const useAuthStore = create<AuthState>()(
           });
 
           if (error) {
-            console.error("Erreur lors de la mise à jour du mot de passe:", error.message);
+            console.error(
+              "Erreur lors de la mise à jour du mot de passe:",
+              error.message
+            );
             return { error: error.message };
           }
 
@@ -237,7 +251,10 @@ const useAuthStore = create<AuthState>()(
           return { error: null };
         } catch (error) {
           console.error("Error updating password:", error);
-          return { error: "Une erreur est survenue lors de la mise à jour du mot de passe" };
+          return {
+            error:
+              "Une erreur est survenue lors de la mise à jour du mot de passe",
+          };
         }
       },
 
@@ -255,28 +272,37 @@ const useAuthStore = create<AuthState>()(
 
           // Vérifier si l'email est différent de l'email actuel
           if (email === user.email) {
-            return { error: "La nouvelle adresse email est identique à l'adresse actuelle" };
+            return {
+              error:
+                "La nouvelle adresse email est identique à l'adresse actuelle",
+            };
           }
 
           // Vérifier le mot de passe actuel
           if (!password) {
-            return { error: "Veuillez fournir votre mot de passe actuel pour confirmer le changement d'email" };
+            return {
+              error:
+                "Veuillez fournir votre mot de passe actuel pour confirmer le changement d'email",
+            };
           }
 
           // Vérifier le mot de passe en essayant de se connecter avec l'email actuel
-          const { error: signInError } = await supabase.auth.signInWithPassword({
-            email: user.email,
-            password,
-          });
+          const { error: signInError } = await supabase.auth.signInWithPassword(
+            {
+              email: user.email,
+              password,
+            }
+          );
 
           if (signInError) {
             return { error: "Mot de passe incorrect" };
           }
 
           // Mettre à jour l'email
-          const { error } = await supabase.auth.updateUser({
-            email,
-          });
+          const { error } = await supabase.auth.updateUser(
+            { email },
+            { emailRedirectTo: window.location.origin }
+          );
 
           if (error) {
             return { error: error.message };
@@ -285,7 +311,53 @@ const useAuthStore = create<AuthState>()(
           return { error: null };
         } catch (error) {
           console.error("Error updating email:", error);
-          return { error: "Une erreur est survenue lors de la mise à jour de l'adresse email" };
+          return {
+            error:
+              "Une erreur est survenue lors de la mise à jour de l'adresse email",
+          };
+        }
+      },
+
+      // Gérer la confirmation de changement d'email
+      handleEmailChangeConfirmation: async () => {
+        const { supabase } = get();
+        if (!supabase) return { error: "Supabase client not initialized" };
+
+        try {
+          // Vérifier si l'utilisateur est connecté
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
+          if (!session) {
+            return { error: "Vous n'êtes pas connecté." };
+          }
+
+          // Récupérer les informations de l'utilisateur
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+
+          if (!user) {
+            return {
+              error:
+                "Impossible de récupérer les informations de l'utilisateur.",
+            };
+          }
+
+          // Mettre à jour l'état de l'utilisateur
+          set({ user });
+
+          return { error: null };
+        } catch (error) {
+          console.error(
+            "Erreur lors de la gestion de la confirmation d'email:",
+            error
+          );
+          return {
+            error:
+              "Une erreur est survenue lors de la confirmation du changement d'email.",
+          };
         }
       },
 
@@ -297,12 +369,12 @@ const useAuthStore = create<AuthState>()(
         // Vérifier si l'URL contient un token de récupération
         const hash = window.location.hash;
         const type = new URLSearchParams(hash.substring(1)).get("type");
-        
+
         const isRecoveryMode = type === "recovery";
-        
+
         // Mettre à jour l'état
         set({ isPasswordRecoveryMode: isRecoveryMode });
-        
+
         return isRecoveryMode;
       },
 
