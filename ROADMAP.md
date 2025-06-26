@@ -80,6 +80,7 @@ Elle est pensée pour une utilisation personnelle, simple et sans backend. Les d
 ---
 
 ### 7. Authentification & Synchronisation Supabase
+
 Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareils grâce à Supabase. Le mode par défaut reste en `localStorage`, sans compte requis.
 
 - [x] Installer et configurer Supabase dans le projet
@@ -103,10 +104,10 @@ Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareil
 - [x] Extraction de l'email depuis les tokens JWT
 - [ ] Amélioration des messages d'erreur et de succès
 - [ ] Validation des formulaires avec Zod
-- [ ] Possibilité de modifier son email
+- [x] Possibilité de modifier son email
 - [ ] Possibilité de supprimer son compte
-- [ ] Ajout d'une page de profil utilisateur
-- [ ] Gestion des sessions multiples
+- [x] Ajout d'une page de profil utilisateur
+- [x] Gestion des sessions multiples
 - [ ] Ajout d'une option "Se souvenir de moi"
 
 ---

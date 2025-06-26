@@ -4,18 +4,33 @@ import {
   CheckCircleIcon,
   EyeIcon,
   EyeOffIcon,
+  InfoIcon,
   SaveIcon,
+  TrashIcon,
   UserIcon,
+  MailIcon,
+  KeyIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 import { Alert, AlertDescription } from "../ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 const ProfileButton: React.FC = () => {
-  const { user, updatePassword, updateEmail } = useAuthStore();
+  const { user, updatePassword, updateEmail, deleteAccount } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -27,7 +42,11 @@ const ProfileButton: React.FC = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState<"email" | "password">("email");
+  const [activeTab, setActiveTab] = useState<"email" | "password" | "delete">("email");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Réinitialiser les champs lorsque la modal est fermée
   React.useEffect(() => {
@@ -36,11 +55,16 @@ const ProfileButton: React.FC = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setDeletePassword("");
       setError(null);
       setSuccess(null);
+      setDeleteError(null);
       setShowCurrentPassword(false);
       setShowNewPassword(false);
       setShowConfirmPassword(false);
+      setShowDeletePassword(false);
+      setIsDeleteDialogOpen(false);
+      setActiveTab("email"); // Réinitialiser l'onglet actif à l'email
     }
   }, [isOpen, user]);
 
@@ -136,6 +160,34 @@ const ProfileButton: React.FC = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    setDeleteError(null);
+
+    try {
+      if (!deletePassword) {
+        setDeleteError("Veuillez entrer votre mot de passe pour confirmer la suppression.");
+        setIsLoading(false);
+        return;
+      }
+
+      const { error } = await deleteAccount(deletePassword);
+
+      if (error) {
+        setDeleteError(error);
+        setIsLoading(false);
+      } else {
+        // La suppression a réussi, la déconnexion est gérée dans la fonction deleteAccount
+        setIsDeleteDialogOpen(false);
+        setIsOpen(false);
+      }
+    } catch (err) {
+      setDeleteError("Une erreur est survenue lors de la suppression du compte.");
+      console.error(err);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Button
@@ -154,35 +206,36 @@ const ProfileButton: React.FC = () => {
             <DialogTitle>Profil utilisateur</DialogTitle>
           </DialogHeader>
 
-          <div className="flex gap-4 mb-4">
-            <Button
-              type="button"
-              variant={activeTab === "email" ? "default" : "outline"}
-              onClick={() => {
-                setActiveTab("email");
-                setError(null);
-                setSuccess(null);
-              }}
-              className="flex-1"
-            >
-              Modifier l'email
-            </Button>
-            <Button
-              type="button"
-              variant={activeTab === "password" ? "default" : "outline"}
-              onClick={() => {
-                setActiveTab("password");
-                setError(null);
-                setSuccess(null);
-              }}
-              className="flex-1"
-            >
-              Modifier le mot de passe
-            </Button>
-          </div>
+          <Tabs
+            defaultValue="email"
+            value={activeTab}
+            onValueChange={(value) => {
+              setActiveTab(value as "email" | "password" | "delete");
+              setError(null);
+              setSuccess(null);
+            }}
+            className="w-full"
+          >
+            <TabsList className="w-full grid grid-cols-3 mb-4">
+              <TabsTrigger value="email" className="flex items-center gap-1">
+                <MailIcon className="size-4" />
+                <span className="hidden sm:inline">Modifier l'email</span>
+                <span className="sm:hidden">Email</span>
+              </TabsTrigger>
+              <TabsTrigger value="password" className="flex items-center gap-1">
+                <KeyIcon className="size-4" />
+                <span className="hidden sm:inline">Modifier le mot de passe</span>
+                <span className="sm:hidden">Mot de passe</span>
+              </TabsTrigger>
+              <TabsTrigger value="delete" className="flex items-center gap-1 text-destructive">
+                <TrashIcon className="size-4" />
+                <span className="hidden sm:inline">Supprimer le compte</span>
+                <span className="sm:hidden">Supprimer</span>
+              </TabsTrigger>
+            </TabsList>
 
-          {activeTab === "email" ? (
-            <form onSubmit={handleUpdateEmail} className="space-y-4">
+            <TabsContent value="email" className="mt-0">
+              <form onSubmit={handleUpdateEmail} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Nouvel email</Label>
                 <Input
@@ -247,7 +300,9 @@ const ProfileButton: React.FC = () => {
                 </Button>
               </div>
             </form>
-          ) : (
+            </TabsContent>
+            
+            <TabsContent value="password" className="mt-0">
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Mot de passe actuel</Label>
@@ -355,7 +410,105 @@ const ProfileButton: React.FC = () => {
                 </Button>
               </div>
             </form>
-          )}
+            </TabsContent>
+            
+            <TabsContent value="delete" className="mt-0">
+            <div className="space-y-4">
+              <Alert variant="destructive" className="py-2">
+                <AlertCircleIcon />
+                <AlertDescription>
+                  Attention : La suppression de votre compte est irréversible. Toutes vos données sur Supabase seront définitivement supprimées.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert variant="info" className="py-2">
+                <InfoIcon />
+                <AlertDescription>
+                  Vos données locales seront conservées. L'application passera en mode non synchronisé et vous pourrez continuer à l'utiliser sans compte.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <TrashIcon className="size-4" />
+                  Supprimer mon compte
+                </Button>
+              </div>
+            </div>
+            </TabsContent>
+          </Tabs>
+          
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer votre compte ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action est irréversible. Votre compte et toutes vos données sur Supabase seront définitivement supprimés.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              
+              <div className="space-y-4">
+                <Alert variant="info" className="py-2">
+                  <InfoIcon />
+                  <AlertDescription>
+                    Vos données locales seront conservées. L'application passera en mode non synchronisé.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</Label>
+                  <div className="relative">
+                    <Input
+                      id="deletePassword"
+                      type={showDeletePassword ? "text" : "password"}
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                      onClick={() => setShowDeletePassword(!showDeletePassword)}
+                      tabIndex={-1}
+                    >
+                      {showDeletePassword ? (
+                        <EyeIcon className="size-4" />
+                      ) : (
+                        <EyeOffIcon className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                
+                {deleteError && (
+                  <Alert variant="destructive" className="py-2">
+                    <AlertCircleIcon />
+                    <AlertDescription>{deleteError}</AlertDescription>
+                  </Alert>
+                )}
+              </div>
+              
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDeleteAccount();
+                  }}
+                  disabled={isLoading}
+                  className="bg-destructive hover:bg-destructive/90"
+                >
+                  {isLoading ? "Suppression..." : "Supprimer définitivement"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
     </>

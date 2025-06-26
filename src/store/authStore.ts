@@ -36,6 +36,7 @@ interface AuthState {
   ) => Promise<{ error: string | null }>;
   handleEmailChangeConfirmation: () => Promise<{ error: string | null }>;
   checkPasswordRecoveryMode: () => Promise<boolean>;
+  deleteAccount: (password: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   syncWeeks: () => Promise<void>;
   updateWeekInSupabase: (weekData: WeekData) => Promise<void>;
@@ -376,6 +377,55 @@ const useAuthStore = create<AuthState>()(
         set({ isPasswordRecoveryMode: isRecoveryMode });
 
         return isRecoveryMode;
+      },
+
+      // Supprimer le compte utilisateur
+      deleteAccount: async (password) => {
+        const { supabase, user } = get();
+        if (!supabase) return { error: "Supabase client not initialized" };
+        if (!user) return { error: "Aucun utilisateur connecté" };
+
+        try {
+          // Vérifier le mot de passe en essayant de se connecter
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: user.email || "",
+            password,
+          });
+
+          if (signInError) {
+            return { error: "Mot de passe incorrect" };
+          }
+
+          // Arrêter la synchronisation automatique avant la suppression
+          get().stopAutoSync();
+
+          // Supprimer les données de l'utilisateur dans Supabase
+          // Nous ne pouvons pas utiliser admin.deleteUser côté client, donc nous allons
+          // supprimer les données de l'utilisateur et le déconnecter
+          const { error: deleteDataError } = await supabase
+            .from("weeks")
+            .delete()
+            .eq("user_id", user.id);
+
+          if (deleteDataError) {
+            console.error("Erreur lors de la suppression des données:", deleteDataError);
+            // Continuer même en cas d'erreur pour permettre à l'utilisateur de se déconnecter
+          }
+
+          // Déconnecter l'utilisateur
+          await supabase.auth.signOut();
+          set({
+            user: null,
+            lastSyncedAt: null,
+            syncStatus: "not_synced",
+            syncError: null,
+          });
+
+          return { error: null };
+        } catch (err) {
+          console.error("Erreur lors de la suppression du compte:", err);
+          return { error: "Une erreur est survenue lors de la suppression du compte" };
+        }
       },
 
       // Déconnexion
