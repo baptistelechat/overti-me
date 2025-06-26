@@ -379,7 +379,7 @@ const useAuthStore = create<AuthState>()(
         return isRecoveryMode;
       },
 
-      // Supprimer le compte utilisateur
+      // Supprimer les données de l'utilisateur
       deleteAccount: async (password) => {
         const { supabase, user } = get();
         if (!supabase) return { error: "Supabase client not initialized" };
@@ -400,8 +400,6 @@ const useAuthStore = create<AuthState>()(
           get().stopAutoSync();
 
           // Supprimer les données de l'utilisateur dans Supabase
-          // Nous ne pouvons pas utiliser admin.deleteUser côté client, donc nous allons
-          // supprimer les données de l'utilisateur et le déconnecter
           const { error: deleteDataError } = await supabase
             .from("weeks")
             .delete()
@@ -409,7 +407,7 @@ const useAuthStore = create<AuthState>()(
 
           if (deleteDataError) {
             console.error("Erreur lors de la suppression des données:", deleteDataError);
-            // Continuer même en cas d'erreur pour permettre à l'utilisateur de se déconnecter
+            return { error: "Erreur lors de la suppression des données" };
           }
 
           // Déconnecter l'utilisateur
@@ -423,8 +421,8 @@ const useAuthStore = create<AuthState>()(
 
           return { error: null };
         } catch (err) {
-          console.error("Erreur lors de la suppression du compte:", err);
-          return { error: "Une erreur est survenue lors de la suppression du compte" };
+          console.error("Erreur lors de la suppression des données:", err);
+          return { error: "Une erreur est survenue lors de la suppression des données" };
         }
       },
 

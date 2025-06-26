@@ -105,10 +105,9 @@ Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareil
 - [ ] Amélioration des messages d'erreur et de succès
 - [ ] Validation des formulaires avec Zod
 - [x] Possibilité de modifier son email
-- [ ] Possibilité de supprimer son compte
+- [ ] Possibilité de supprimer son compte (WIP)
 - [x] Ajout d'une page de profil utilisateur
 - [x] Gestion des sessions multiples
-- [ ] Ajout d'une option "Se souvenir de moi"
 
 ---
 
@@ -116,7 +115,7 @@ Permettre à l'utilisateur de synchroniser ses semaines entre plusieurs appareil
 
 - [ ] Mise en place de politiques RLS plus strictes
 - [ ] Ajout d'une page de confidentialité
-- [ ] Option pour supprimer toutes les données utilisateur
+- [x] Option pour supprimer toutes les données utilisateur
 - [ ] Chiffrement des données sensibles
 - [ ] Audit de sécurité
 - [ ] Mise en place de limites de taux (rate limiting)

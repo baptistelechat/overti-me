@@ -47,8 +47,9 @@ const ProfileButton: React.FC = () => {
   const [deletePassword, setDeletePassword] = useState("");
   const [showDeletePassword, setShowDeletePassword] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  // Réinitialiser les champs lorsque la modal est fermée
+  // Réinitialiser les champs lorsque la modal est fermée ou l'utilisateur change
   React.useEffect(() => {
     if (!isOpen) {
       setEmail(user?.email || "");
@@ -56,6 +57,7 @@ const ProfileButton: React.FC = () => {
       setNewPassword("");
       setConfirmPassword("");
       setDeletePassword("");
+      setDeleteConfirmation("");
       setError(null);
       setSuccess(null);
       setDeleteError(null);
@@ -64,6 +66,7 @@ const ProfileButton: React.FC = () => {
       setShowConfirmPassword(false);
       setShowDeletePassword(false);
       setIsDeleteDialogOpen(false);
+      setIsLoading(false); // Réinitialiser l'état de chargement
       setActiveTab("email"); // Réinitialiser l'onglet actif à l'email
     }
   }, [isOpen, user]);
@@ -74,6 +77,14 @@ const ProfileButton: React.FC = () => {
       setEmail(user.email || "");
     }
   }, [isOpen, user]);
+  
+  // Réinitialiser l'état de chargement lorsque l'utilisateur change
+  React.useEffect(() => {
+    // Si l'utilisateur change (déconnexion/reconnexion), réinitialiser l'état de chargement
+    setIsLoading(false);
+    setDeleteError(null);
+    setDeleteConfirmation("");
+  }, [user]);
 
   // Si l'utilisateur n'est pas connecté, ne rien afficher
   if (!user) return null;
@@ -171,6 +182,13 @@ const ProfileButton: React.FC = () => {
         return;
       }
 
+      // Vérifier que l'utilisateur a saisi "Supprimer mes données" dans le champ de confirmation (insensible à la casse)
+      if (deleteConfirmation.toLowerCase() !== "supprimer mes données".toLowerCase()) {
+        setDeleteError("Veuillez saisir 'Supprimer mes données' pour confirmer.");
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await deleteAccount(deletePassword);
 
       if (error) {
@@ -229,7 +247,7 @@ const ProfileButton: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger value="delete" className="flex items-center gap-1 text-destructive">
                 <TrashIcon className="size-4" />
-                <span className="hidden sm:inline">Supprimer le compte</span>
+                <span className="hidden sm:inline">Supprimer mes données</span>
                 <span className="sm:hidden">Supprimer</span>
               </TabsTrigger>
             </TabsList>
@@ -417,7 +435,7 @@ const ProfileButton: React.FC = () => {
               <Alert variant="destructive" className="py-2">
                 <AlertCircleIcon />
                 <AlertDescription>
-                  Attention : La suppression de votre compte est irréversible. Toutes vos données sur Supabase seront définitivement supprimées.
+                  Attention : La suppression de vos données est irréversible. Toutes vos données sur Supabase seront définitivement supprimées.
                 </AlertDescription>
               </Alert>
               
@@ -436,7 +454,7 @@ const ProfileButton: React.FC = () => {
                   className="flex items-center gap-2"
                 >
                   <TrashIcon className="size-4" />
-                  Supprimer mon compte
+                  Supprimer mes données
                 </Button>
               </div>
             </div>
@@ -446,9 +464,9 @@ const ProfileButton: React.FC = () => {
           <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer votre compte ?</AlertDialogTitle>
+                <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer vos données ?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Cette action est irréversible. Votre compte et toutes vos données sur Supabase seront définitivement supprimés.
+                  Cette action est irréversible. Toutes vos données sur Supabase seront définitivement supprimées et vous serez déconnecté.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               
@@ -485,6 +503,20 @@ const ProfileButton: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="deleteConfirmation">
+                    Pour confirmer, saisissez :<span className="font-semibold">"Supprimer mes données"</span>
+                  </Label>
+                  <Input
+                    id="deleteConfirmation"
+                    type="text"
+                    value={deleteConfirmation}
+                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                    placeholder="Supprimer mes données"
+                    required
+                  />
+                </div>
                 
                 {deleteError && (
                   <Alert variant="destructive" className="py-2">
@@ -504,7 +536,7 @@ const ProfileButton: React.FC = () => {
                   disabled={isLoading}
                   className="bg-destructive hover:bg-destructive/90"
                 >
-                  {isLoading ? "Suppression..." : "Supprimer définitivement"}
+                  {isLoading ? "Suppression..." : "Supprimer mes données"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
