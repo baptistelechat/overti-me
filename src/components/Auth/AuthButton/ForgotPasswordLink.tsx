@@ -10,7 +10,11 @@ const ForgotPasswordLink: React.FC<ForgotPasswordLinkProps> = ({
 }) => {
   return (
     <div className="text-sm text-right">
-      <Button variant={"link"} onClick={() => setAuthAction("forgot")}>
+      <Button 
+        type="button" 
+        variant={"link"} 
+        onClick={() => setAuthAction("forgot")}
+      >
         Mot de passe oublié ?
       </Button>
     </div>
