@@ -2,7 +2,7 @@ import { Trash2Icon } from "lucide-react";
 import React, { useEffect } from "react";
 import useAuthStore from "../store/authStore";
 import useWeekStore from "../store/weekStore";
-import AuthButton from "./Auth/AuthButton";
+import AuthButton from "./Auth/AuthButton/AuthButton";
 import EmailChangeConfirmationHandler from "./Auth/EmailChangeConfirmationHandler";
 import ProfileButton from "./Auth/ProfileButton";
 import SyncStatus from "./Auth/SyncStatus";
@@ -50,7 +50,7 @@ const WeekView: React.FC = () => {
       <div className="mb-4">
         <EmailChangeConfirmationHandler />
       </div>
-      
+
       <div className="flex flex-col items-center mb-6">
         <h1 className="text-3xl font-bold text-center mb-2">⌚ Overti.me</h1>
         <div className="flex items-center gap-2">
