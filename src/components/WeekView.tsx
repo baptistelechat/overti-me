@@ -4,7 +4,7 @@ import useAuthStore from "../store/authStore";
 import useWeekStore from "../store/weekStore";
 import AuthButton from "./Auth/AuthButton/AuthButton";
 import EmailChangeConfirmationHandler from "./Auth/EmailChangeConfirmationHandler";
-import ProfileButton from "./Auth/ProfileButton";
+import ProfileButton from "./Auth/ProfileButton/ProfileButton";
 import SyncStatus from "./Auth/SyncStatus";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
