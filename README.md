@@ -1,54 +1,54 @@
-# React + TypeScript + Vite
+# OverTi-me - Overtime Hours Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+OverTi-me is a web application for tracking and managing your working hours and overtime. The application automatically calculates regular hours, 25% overtime, and 50% overtime based on configured thresholds.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Track working hours by day and week
+- Automatic calculation of regular and overtime hours
+- Export data to JSON format (CSV and Excel coming soon)
+- Data synchronization with Supabase (optional)
+- Offline mode with local storage
+- Responsive interface for mobile and desktop
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Clone the repository
+git clone https://github.com/your-username/overti-me.git
+cd overti-me
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Supabase Configuration (optional)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The application can work entirely offline with local storage. If you want to enable synchronization with Supabase:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+1. Create an account on [Supabase](https://supabase.com/) and create a new project
+2. Configure email authentication in your Supabase project
+3. Run the SQL script provided in `supabase/schema.sql` to create the `weeks` table
+4. Copy the `.env.example` file to `.env.local` and fill in the environment variables:
+
 ```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+See the `supabase/README.md` file for more details on Supabase configuration.
+
+## Technologies Used
+
+- React with TypeScript
+- Vite for bundling
+- Zustand for state management
+- Supabase for backend and authentication (optional)
+- TailwindCSS for styling
+
+## License
+
+MIT

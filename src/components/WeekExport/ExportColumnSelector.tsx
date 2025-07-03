@@ -3,6 +3,11 @@ import React, { useMemo } from "react";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import { useExportStore } from "../../store/exportStore";
 import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 
@@ -26,27 +31,34 @@ export const ExportColumnSelector: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center mb-3">
-        <div className="mr-3">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={
-              areAllColumnsSelected ? deselectAllColumns : selectAllColumns
-            }
-            className="h-7 w-7"
-            title={
-              areAllColumnsSelected
-                ? "Tout désélectionner"
-                : "Tout sélectionner"
-            }
-          >
-            {areAllColumnsSelected ? (
-              <CheckSquare className="h-4 w-4" />
-            ) : (
-              <Square className="h-4 w-4" />
-            )}
-          </Button>
+      <div className="flex items-center mb-4">
+        <div className="mr-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={
+                  areAllColumnsSelected ? deselectAllColumns : selectAllColumns
+                }
+                className="size-7"
+              >
+                {areAllColumnsSelected ? (
+                  <CheckSquare className="size-4" />
+                ) : (
+                  <Square className="size-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {areAllColumnsSelected
+                  ? "Tout désélectionner"
+                  : "Tout sélectionner"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <h4 className="font-medium">Colonnes à inclure</h4>
       </div>

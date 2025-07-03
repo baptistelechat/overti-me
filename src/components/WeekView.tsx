@@ -1,6 +1,11 @@
 import { Trash2Icon } from "lucide-react";
 import React, { useEffect } from "react";
+import useAuthStore from "../store/authStore";
 import useWeekStore from "../store/weekStore";
+import AuthButton from "./Auth/AuthButton/AuthButton";
+import EmailChangeConfirmationHandler from "./Auth/EmailChangeConfirmationHandler";
+import ProfileButton from "./Auth/ProfileButton/ProfileButton";
+import SyncStatus from "./Auth/SyncStatus";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import WeekExport from "./WeekExport/index";
@@ -19,10 +24,13 @@ const WeekView: React.FC = () => {
     resetWeek,
   } = useWeekStore();
 
-  // Initialiser la semaine au chargement du composant
+  const { initialize: initializeAuth } = useAuthStore();
+
+  // Initialiser la semaine et l'authentification au chargement du composant
   useEffect(() => {
     initializeWeek();
-  }, [initializeWeek]);
+    initializeAuth();
+  }, [initializeWeek, initializeAuth]);
 
   // Récupérer les données de la semaine courante
   const currentWeek = weeks[currentWeekId];
@@ -38,7 +46,19 @@ const WeekView: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-center mb-6">⌚ Overti.me</h1>
+      {/* Gestionnaire de confirmation de changement d'email */}
+      <div className="mb-4">
+        <EmailChangeConfirmationHandler />
+      </div>
+
+      <div className="flex flex-col items-center mb-6">
+        <h1 className="text-3xl font-bold text-center mb-2">⌚ Overti.me</h1>
+        <div className="flex items-center gap-2">
+          <AuthButton />
+          <ProfileButton />
+        </div>
+        <SyncStatus className="mt-2" />
+      </div>
 
       {/* Navigation entre les semaines */}
       <WeekNavigation weekId={currentWeekId} />
@@ -81,7 +101,7 @@ const WeekView: React.FC = () => {
             variant="outline"
             className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
-            <Trash2Icon className="h-4 w-4 mr-2" />
+            <Trash2Icon className="h-4 w-4 mr-1" />
             Réinitialiser toutes les données de la semaine
           </Button>
         </div>

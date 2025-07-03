@@ -1,8 +1,14 @@
+import {
+  getNextWeekId,
+  getPreviousWeekId,
+  getWeekId,
+} from "@/utils/date/weekId";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
 import useWeekStore from "../store/weekStore";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { getNextWeekId, getPreviousWeekId, getWeekId } from "@/utils/date/weekId";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface WeekNavigationProps {
   weekId: string;
@@ -30,7 +36,7 @@ const WeekNavigation: React.FC<WeekNavigationProps> = ({ weekId }) => {
     const today = new Date();
     // Utiliser la fonction getWeekId de dateUtils pour assurer la cohérence
     const currentWeekId = getWeekId(today);
-    
+
     setCurrentWeekId(currentWeekId);
   };
 
@@ -55,7 +61,8 @@ const WeekNavigation: React.FC<WeekNavigationProps> = ({ weekId }) => {
           variant="outline"
           aria-label="Semaine précédente"
         >
-          ← Précédente
+          <ChevronLeft />
+          Précédente
         </Button>
 
         <Button
@@ -71,21 +78,27 @@ const WeekNavigation: React.FC<WeekNavigationProps> = ({ weekId }) => {
           variant="outline"
           aria-label="Semaine suivante"
         >
-          Suivante →
+          Suivante <ChevronRight />
         </Button>
       </div>
 
       {/* Formulaire pour aller à une semaine spécifique */}
       <form onSubmit={goToSpecificWeek} className="flex">
         <div className="flex w-full max-w-sm items-center space-x-2">
-          <Input
-            type="text"
-            name="weekInput"
-            placeholder="AAAA-WXX"
-            pattern="^\d{4}-W\d{2}$"
-            title="Format: AAAA-WXX (ex: 2023-W01)"
-            className="rounded-r-none"
-          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Input
+                type="text"
+                name="weekInput"
+                placeholder="AAAA-WXX"
+                pattern="^\d{4}-W\d{2}$"
+                className="rounded-r-none"
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Format: AAAA-WXX (ex: 2025-W01)</p>
+            </TooltipContent>
+          </Tooltip>
           <Button type="submit" className="rounded-l-none">
             Aller
           </Button>

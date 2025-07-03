@@ -4,6 +4,7 @@ import { useExportStore } from "../../store/exportStore";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 /**
  * Composant pour la sélection du format d'exportation
@@ -25,28 +26,33 @@ export const ExportFormatSelector: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center mb-3">
-        <div className="mr-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={
-              areAllFormatsSelected ? deselectAllFormats : selectAllFormats
-            }
-            className="h-7 w-7"
-            title={
-              areAllFormatsSelected
-                ? "Tout désélectionner"
-                : "Tout sélectionner"
-            }
-          >
-            {areAllFormatsSelected ? (
-              <CheckSquare className="h-4 w-4" />
-            ) : (
-              <Square className="h-4 w-4" />
-            )}
-          </Button>
+      <div className="flex items-center mb-4">
+        <div className="mr-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={
+                  areAllFormatsSelected ? deselectAllFormats : selectAllFormats
+                }
+                className="size-7"
+              >
+                {areAllFormatsSelected ? (
+                  <CheckSquare className="size-4" />
+                ) : (
+                  <Square className="size-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {areAllFormatsSelected
+                  ? "Tout désélectionner"
+                  : "Tout sélectionner"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <h4 className="font-medium">Format(s)</h4>
       </div>
