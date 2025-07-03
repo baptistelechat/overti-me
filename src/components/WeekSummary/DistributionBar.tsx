@@ -1,5 +1,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DistributionBarProps {
   normalHours: number;
@@ -49,31 +54,49 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
       {/* Barre de progression personnalisée avec 3 sections */}
       <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
         {/* Section heures normales (verte) */}
-        <div
-          className="absolute left-0 top-0 h-full bg-green-500 z-10"
-          style={{ width: `${normalPercentage}%` }}
-          title={`Heures normales: ${normalHours.toFixed(2)}h (${normalPercentage.toFixed(1)}%)`}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className="absolute left-0 top-0 h-full bg-green-500 z-10"
+              style={{ width: `${normalPercentage}%` }}
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Heures normales: {normalHours.toFixed(2)}h ({normalPercentage.toFixed(1)}%)</p>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Section heures majorées 25% (jaune) */}
-        <div
-          className="absolute top-0 h-full bg-yellow-500 z-20"
-          style={{
-            left: `${normalPercentage}%`,
-            width: `${overtime25Percentage}%`,
-          }}
-          title={`Heures majorées (+25%): ${overtimeHours25.toFixed(2)}h (${overtime25Percentage.toFixed(1)}%)`}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className="absolute top-0 h-full bg-yellow-500 z-20"
+              style={{
+                left: `${normalPercentage}%`,
+                width: `${overtime25Percentage}%`,
+              }}
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Heures majorées (+25%): {overtimeHours25.toFixed(2)}h ({overtime25Percentage.toFixed(1)}%)</p>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Section heures majorées 50% (rouge) */}
-        <div
-          className="absolute top-0 h-full bg-red-500 z-30 rounded-r-full"
-          style={{
-            left: `${normalPercentage + overtime25Percentage}%`,
-            width: `${overtime50Percentage}%`,
-          }}
-          title={`Heures majorées (+50%): ${overtimeHours50.toFixed(2)}h (${overtime50Percentage.toFixed(1)}%)`}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className="absolute top-0 h-full bg-red-500 z-30 rounded-r-full"
+              style={{
+                left: `${normalPercentage + overtime25Percentage}%`,
+                width: `${overtime50Percentage}%`,
+              }}
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Heures majorées (+50%): {overtimeHours50.toFixed(2)}h ({overtime50Percentage.toFixed(1)}%)</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {/* Légende */}

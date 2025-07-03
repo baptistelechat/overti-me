@@ -4,6 +4,11 @@ import { DAILY_HOURS_THRESHOLD } from "@/constants/hoursThreshold";
 import { cn } from "@/lib/utils";
 import { Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { TableCell, TableRow } from "../ui/table";
@@ -153,16 +158,22 @@ export const DayRow: React.FC<DayRowProps> = ({
       {/* Actions */}
       <TableCell className="text-center">
         {(day.startTime || day.endTime || day.lunchBreakStart || day.lunchBreakEnd) && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-5 hover:bg-destructive/10 transition-colors"
-            onClick={handleResetDay}
-            title="Réinitialiser ce jour"
-            aria-label="Réinitialiser ce jour"
-          >
-            <Trash2Icon className="h-3 w-3" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-5 hover:bg-destructive/10 transition-colors"
+                onClick={handleResetDay}
+                aria-label="Réinitialiser ce jour"
+              >
+                <Trash2Icon className="h-3 w-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Réinitialiser ce jour</p>
+            </TooltipContent>
+          </Tooltip>
         )}
       </TableCell>
     </TableRow>

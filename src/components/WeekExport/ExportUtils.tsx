@@ -1,3 +1,4 @@
+import { formatShortDate, formatWeekday } from "@/utils/date/formatters";
 import * as XLSX from "xlsx";
 import type { WeekData } from "../../types/index";
 
@@ -7,7 +8,7 @@ import type { WeekData } from "../../types/index";
  */
 export const prepareExportData = (
   currentWeek: WeekData,
-  selectedColumns: string[],
+  selectedColumns: string[]
 ) => {
   if (!currentWeek) return [];
 
@@ -17,18 +18,12 @@ export const prepareExportData = (
 
     // Filtrer les colonnes selon la sélection
     if (selectedColumns.includes("Jour")) {
-      const date = new Date(day.date);
-      const options: Intl.DateTimeFormatOptions = { weekday: "long" };
-      const jour = new Intl.DateTimeFormat("fr-FR", options).format(date);
-      data.Jour = jour.charAt(0).toUpperCase() + jour.slice(1);
+      // Utilisation de la fonction formatWeekday de notre utilitaire centralisé
+      data.Jour = formatWeekday(day.date, true); // true pour capitaliser la première lettre
     }
     if (selectedColumns.includes("Date")) {
-      const date = new Date(day.date);
-      data.Date = date.toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      });
+      // Utilisation de la fonction formatShortDate de notre utilitaire centralisé
+      data.Date = formatShortDate(new Date(day.date));
     }
     if (selectedColumns.includes("Debut")) data.Debut = day.startTime || "";
     if (selectedColumns.includes("PauseDebut"))
@@ -36,8 +31,7 @@ export const prepareExportData = (
     if (selectedColumns.includes("PauseFin"))
       data.PauseFin = day.lunchBreakEnd || "";
     if (selectedColumns.includes("Fin")) data.Fin = day.endTime || "";
-    if (selectedColumns.includes("Duree"))
-      data.Duree = day.calculatedDuration;
+    if (selectedColumns.includes("Duree")) data.Duree = day.calculatedDuration;
 
     return data;
   });
@@ -93,7 +87,10 @@ export const prepareExportData = (
 /**
  * Exporte les données au format JSON
  */
-export const exportToJson = (exportData: Record<string, any>[], currentWeekId: string) => {
+export const exportToJson = (
+  exportData: Record<string, any>[],
+  currentWeekId: string
+) => {
   const jsonString = JSON.stringify(exportData, null, 2);
   const blob = new Blob([jsonString], { type: "application/json" });
   const url = URL.createObjectURL(blob);
