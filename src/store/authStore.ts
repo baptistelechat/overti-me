@@ -42,6 +42,7 @@ interface AuthState {
   updateWeekInSupabase: (weekData: WeekData) => Promise<void>;
   setupAutoSync: () => void;
   stopAutoSync: () => void;
+  getRedirectURL: () => string;
 }
 
 // Créer le client Supabase
@@ -151,7 +152,17 @@ const useAuthStore = create<AuthState>()(
         const { supabase } = get();
         if (!supabase) return { error: "Supabase client not initialized" };
 
-        const result = await supabase.auth.signUp({ email, password });
+        // Obtenir l'URL de redirection appropriée
+        const redirectURL = get().getRedirectURL();
+        console.log("URL de redirection pour l'inscription:", redirectURL);
+
+        const result = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectURL
+          }
+        });
 
         if (result.error) {
           return { error: result.error.message };
@@ -213,8 +224,12 @@ const useAuthStore = create<AuthState>()(
         const { supabase } = get();
         if (!supabase) return { error: "Supabase client not initialized" };
 
+        // Obtenir l'URL de redirection appropriée
+        const redirectURL = get().getRedirectURL();
+        console.log("URL de redirection pour la réinitialisation du mot de passe:", redirectURL);
+
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}`,
+          redirectTo: redirectURL,
         });
 
         if (error) {
@@ -259,6 +274,30 @@ const useAuthStore = create<AuthState>()(
         }
       },
 
+      // Fonction utilitaire pour obtenir l'URL de redirection appropriée
+      // Cette fonction gère les différents environnements (dev, production)
+      getRedirectURL: () => {
+        // Récupérer l'URL de l'environnement actuel
+        const currentURL = window.location.origin;
+        
+        // Si nous sommes en production (pas localhost), utiliser cette URL
+        if (!currentURL.includes('localhost')) {
+          return currentURL;
+        }
+        
+        // Si nous sommes en développement mais que la redirection doit aller en production
+        // Remplacer cette URL par l'URL de production si nécessaire
+        // Par exemple, si vous déployez sur Vercel, vous pourriez utiliser votre domaine personnalisé
+        const productionURL = import.meta.env.VITE_PRODUCTION_URL;
+        if (productionURL) {
+          console.log("Utilisation de l'URL de production configurée:", productionURL);
+          return productionURL;
+        }
+        
+        // En développement local, utiliser localhost par défaut
+        return currentURL;
+      },
+
       // Mettre à jour l'email
       updateEmail: async (email, password) => {
         const { supabase } = get();
@@ -299,10 +338,14 @@ const useAuthStore = create<AuthState>()(
             return { error: "Mot de passe incorrect" };
           }
 
+          // Obtenir l'URL de redirection appropriée
+          const redirectURL = get().getRedirectURL();
+          console.log("URL de redirection pour le changement d'email:", redirectURL);
+
           // Mettre à jour l'email
           const { error } = await supabase.auth.updateUser(
             { email },
-            { emailRedirectTo: window.location.origin }
+            { emailRedirectTo: redirectURL }
           );
 
           if (error) {

@@ -37,7 +37,22 @@ The application can work entirely offline with local storage. If you want to ena
 ```
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Production URL for authentication redirects
+VITE_PRODUCTION_URL=your_production_url
 ```
+
+### Authentication Redirects Configuration
+
+For authentication features like email verification, password reset, and email change to work correctly in production:
+
+1. Set the `VITE_PRODUCTION_URL` environment variable to your production URL (e.g., `https://your-app.vercel.app`)
+2. In your Supabase dashboard, go to Authentication > URL Configuration
+3. Add your production URL to the "Site URL" field
+4. Add all necessary redirect URLs to the "Redirect URLs" list:
+   - Your production URL (e.g., `https://your-app.vercel.app`)
+   - Your local development URL (e.g., `http://localhost:3000`)
+   - Any preview deployment URLs (you can use wildcards like `https://*.vercel.app` for Vercel preview deployments)
 
 See the `supabase/README.md` file for more details on Supabase configuration.
 
