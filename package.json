@@ -2,7 +2,7 @@
   "name": "overti-me",
   "description": "overti-me is a time tracking app that allows you to manage your time more efficiently.",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
